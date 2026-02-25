@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+@layer base {
+  :root {
+    --background: 270 30% 98%;
+    --foreground: 260 20% 20%;
+
+    --card: 270 25% 99%;
+    --card-foreground: 260 20% 20%;
+
+    --popover: 270 25% 99%;
+    --popover-foreground: 260 20% 20%;
+
+    --primary: 260 50% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 270 30% 94%;
+    --secondary-foreground: 260 30% 40%;
+
+    --muted: 270 20% 96%;
+    --muted-foreground: 260 10% 55%;
+
+    --accent: 340 50% 75%;
+    --accent-foreground: 340 50% 25%;
+
+    --destructive: 0 55% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 270 15% 92%;
+    --input: 270 15% 92%;
+    --ring: 260 50% 65%;
+
+    --radius: 1rem;
+
+    --sidebar-background: 270 25% 98%;
+    --sidebar-foreground: 260 20% 30%;
+    --sidebar-primary: 260 50% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 270 30% 95%;
+    --sidebar-accent-foreground: 260 20% 20%;
+    --sidebar-border: 270 15% 92%;
+    --sidebar-ring: 260 50% 65%;
+
+    /* Pastel palette tokens */
+    --pastel-lavender: 260 50% 85%;
+    --pastel-mint: 158 40% 85%;
+    --pastel-blue: 210 50% 85%;
+    --pastel-peach: 20 60% 88%;
+    --pastel-pink: 340 45% 88%;
+    --pastel-beige: 35 30% 92%;
+
+    /* Custom tokens */
+    --calm-gradient: linear-gradient(135deg, hsl(260, 50%, 75%), hsl(210, 50%, 80%));
+    --warm-gradient: linear-gradient(135deg, hsl(340, 50%, 80%), hsl(20, 60%, 85%));
+    --mint-gradient: linear-gradient(135deg, hsl(158, 40%, 80%), hsl(180, 35%, 85%));
+    --soft-shadow: 0 8px 32px -6px hsl(260 30% 50% / 0.1);
+    --card-shadow: 0 2px 16px -2px hsl(260 30% 50% / 0.06);
+    --elevated-shadow: 0 12px 40px -8px hsl(260 50% 65% / 0.15);
+
+    /* Page gradients */
+    --page-gradient: linear-gradient(180deg, hsl(270, 30%, 97%) 0%, hsl(260, 25%, 98%) 30%, hsl(210, 30%, 97%) 60%, hsl(340, 20%, 98%) 100%);
+    --page-gradient-clinical: linear-gradient(180deg, hsl(210, 35%, 96%) 0%, hsl(260, 20%, 97%) 50%, hsl(270, 25%, 98%) 100%);
+    --page-gradient-calm: linear-gradient(180deg, hsl(158, 30%, 96%) 0%, hsl(210, 25%, 97%) 50%, hsl(270, 20%, 98%) 100%);
+
+    /* Glassmorphism */
+    --glass-bg: hsl(270 30% 100% / 0.6);
+    --glass-border: hsl(270 30% 95% / 0.7);
+    --glass-shadow: 0 4px 24px -4px hsl(260 30% 50% / 0.06);
+
+    --success: 158 45% 50%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 80% 60%;
+    --warning-foreground: 38 80% 15%;
+    --info: 210 55% 60%;
+    --info-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 260 20% 10%;
+    --foreground: 270 20% 92%;
+
+    --card: 260 20% 13%;
+    --card-foreground: 270 20% 92%;
+
+    --popover: 260 20% 13%;
+    --popover-foreground: 270 20% 92%;
+
+    --primary: 260 45% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 260 20% 18%;
+    --secondary-foreground: 260 30% 75%;
+
+    --muted: 260 15% 16%;
+    --muted-foreground: 260 10% 60%;
+
+    --accent: 340 40% 55%;
+    --accent-foreground: 340 40% 90%;
+
+    --destructive: 0 55% 35%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 260 15% 20%;
+    --input: 260 15% 20%;
+    --ring: 260 45% 60%;
+
+    --sidebar-background: 260 20% 10%;
+    --sidebar-foreground: 270 20% 92%;
+    --sidebar-primary: 260 45% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 20% 16%;
+    --sidebar-accent-foreground: 270 20% 92%;
+    --sidebar-border: 260 15% 20%;
+    --sidebar-ring: 260 45% 60%;
+
+    --page-gradient: linear-gradient(180deg, hsl(260, 20%, 10%) 0%, hsl(260, 18%, 11%) 50%, hsl(260, 15%, 10%) 100%);
+    --page-gradient-clinical: linear-gradient(180deg, hsl(210, 15%, 11%) 0%, hsl(260, 18%, 10%) 100%);
+    --page-gradient-calm: linear-gradient(180deg, hsl(158, 10%, 11%) 0%, hsl(260, 18%, 10%) 100%);
+    
+    --glass-bg: hsl(260 20% 13% / 0.7);
+    --glass-border: hsl(260 15% 22% / 0.5);
+    --glass-shadow: 0 4px 24px -4px hsl(0 0% 0% / 0.2);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  h1, h2, h3 {
+    font-family: 'DM Serif Display', serif;
+  }
+}
+
+@layer utilities {
+  .gradient-calm {
+    background: var(--calm-gradient);
+  }
+  .gradient-warm {
+    background: var(--warm-gradient);
+  }
+  .gradient-mint {
+    background: var(--mint-gradient);
+  }
+  .shadow-soft {
+    box-shadow: var(--soft-shadow);
+  }
+  .shadow-card {
+    box-shadow: var(--card-shadow);
+  }
+  .shadow-elevated {
+    box-shadow: var(--elevated-shadow);
+  }
+  .page-gradient {
+    background: var(--page-gradient);
+  }
+  .page-gradient-clinical {
+    background: var(--page-gradient-clinical);
+  }
+  .page-gradient-calm {
+    background: var(--page-gradient-calm);
+  }
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+  .glass-subtle {
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+  }
+}
