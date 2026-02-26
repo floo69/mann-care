@@ -1,7 +1,7 @@
 import Layout from '@/components/Layout';
 import { FadeIn } from '@/components/Animations';
 import { useAppState } from '@/context/AppContext';
-import { BarChart3, TrendingDown, Flame, Brain } from 'lucide-react';
+import { BarChart3, TrendingDown, Flame } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, Area } from 'recharts';
 
 const ProgressPage = () => {
@@ -41,7 +41,7 @@ const ProgressPage = () => {
 
         {/* Stats */}
         <FadeIn delay={0.1}>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div className="bg-card rounded-2xl p-3 shadow-card text-center">
               <TrendingDown className={`mx-auto mb-1 ${stressChange <= 0 ? 'text-success' : 'text-destructive'}`} size={20} />
               <p className="text-lg font-bold text-foreground">{stressChange <= 0 ? stressChange : `+${stressChange}`}</p>
@@ -51,11 +51,6 @@ const ProgressPage = () => {
               <Flame className="mx-auto mb-1 text-accent" size={20} />
               <p className="text-lg font-bold text-foreground">7</p>
               <p className="text-[10px] text-muted-foreground">Day Streak</p>
-            </div>
-            <div className="bg-card rounded-2xl p-3 shadow-card text-center">
-              <Brain className="mx-auto mb-1 text-info" size={20} />
-              <p className="text-lg font-bold text-foreground">{assessments.length}</p>
-              <p className="text-[10px] text-muted-foreground">Assessments</p>
             </div>
           </div>
         </FadeIn>

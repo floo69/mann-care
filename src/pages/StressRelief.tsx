@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Heart, Shield, ArrowLeft, Send, Bot, User, MessageCircle } from 'lucide-react';
+import { Zap, Heart, Shield, ArrowLeft, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 
@@ -34,26 +34,14 @@ const getSliderLabel = (val: number) => {
   return { text: 'High Stress', color: 'text-destructive' };
 };
 
-// Simple AI response for moderate/high stress chat
-const getStressResponse = (input: string): string => {
-  const lower = input.toLowerCase();
-  if (lower.includes('control') || lower.includes('can\'t'))
-    return "It's okay to recognize what's outside your control. Focus on what you *can* influence right now — even small actions like taking a breath or stepping away for a moment can shift your state. You're doing the right thing by reflecting on this. 💚";
-  if (lower.includes('patient') || lower.includes('work') || lower.includes('shift'))
-    return "Clinical work is demanding, and it's natural to feel the weight of responsibility. Remember: you're human first, clinician second. Your wellbeing directly impacts your care quality. Would you like to try a quick grounding exercise?";
-  return "Thank you for sharing that. Your feelings are completely valid. Healthcare professionals carry so much — it takes real strength to pause and check in with yourself. I'm here for you. Would you like me to suggest a calming exercise, or would you prefer to keep talking?";
-};
 
 const StressRelief = () => {
   const [stressLevel, setStressLevel] = useState(5);
-  const [phase, setPhase] = useState<'slider' | 'low' | 'moderate-questions' | 'moderate-chat' | 'high-calming' | 'high-chat' | 'breathing' | 'affirmation' | 'grounding' | 'complete'>('slider');
+  const [phase, setPhase] = useState<'slider' | 'low' | 'moderate-questions' | 'high-calming' | 'breathing' | 'affirmation' | 'grounding' | 'complete'>('slider');
   const [breathCount, setBreathCount] = useState(0);
   const [affirmationIndex, setAffirmationIndex] = useState(0);
   const [groundingStep, setGroundingStep] = useState(0);
   const [moderateAnswers, setModerateAnswers] = useState({ q1: '', q2: '' });
-  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
-  const [chatInput, setChatInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const navigate = useNavigate();
 
   const startFlow = () => {
@@ -76,30 +64,6 @@ const StressRelief = () => {
     }, 3000);
     return () => clearInterval(interval);
   }, [phase]);
-
-  const sendChat = (initialMsg?: string) => {
-    const msg = initialMsg || chatInput.trim();
-    if (!msg) return;
-    const userMsg = { role: 'user' as const, content: msg };
-    setChatMessages(prev => [...prev, userMsg]);
-    setChatInput('');
-    setIsTyping(true);
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { role: 'assistant', content: getStressResponse(msg) }]);
-      setIsTyping(false);
-    }, 1200);
-  };
-
-  const startModerateChat = () => {
-    const intro = `I understand you're feeling stressed. You mentioned: "${moderateAnswers.q1}". ${moderateAnswers.q2.toLowerCase().includes('yes') ? "It sounds like this is something within your reach to address." : "Sometimes things feel out of our control, and that's okay."} Let's work through this together. 💚`;
-    setChatMessages([{ role: 'assistant', content: intro }]);
-    setPhase('moderate-chat');
-  };
-
-  const startHighChat = () => {
-    setChatMessages([{ role: 'assistant', content: "I'm glad you took a moment to breathe. You showed real self-awareness by recognizing your stress level. I'm here to support you now. How are you feeling after the calming exercise? 💚" }]);
-    setPhase('high-chat');
-  };
 
   const sliderLabel = getSliderLabel(stressLevel);
 
@@ -204,9 +168,8 @@ const StressRelief = () => {
                   <button
                     key={opt}
                     onClick={() => setModerateAnswers(p => ({ ...p, q2: opt }))}
-                    className={`flex-1 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
-                      moderateAnswers.q2 === opt ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
-                    }`}
+                    className={`flex-1 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${moderateAnswers.q2 === opt ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+                      }`}
                   >
                     {opt}
                   </button>
@@ -216,11 +179,11 @@ const StressRelief = () => {
           </div>
 
           <Button
-            onClick={startModerateChat}
+            onClick={() => setPhase('affirmation')}
             disabled={!moderateAnswers.q1.trim() || !moderateAnswers.q2}
             className="w-full rounded-xl py-5 gradient-calm border-none text-primary-foreground"
           >
-            Get Support
+            Continue to Guided Support
           </Button>
 
           <button onClick={() => setPhase('slider')} className="text-xs text-muted-foreground flex items-center gap-1 mx-auto">
@@ -255,7 +218,7 @@ const StressRelief = () => {
 
           <Button
             onClick={() => {
-              if (breathCount >= 2) startHighChat();
+              if (breathCount >= 2) setPhase('grounding');
               else setBreathCount(c => c + 1);
             }}
             className="w-full rounded-xl py-5 gradient-calm border-none text-primary-foreground"
@@ -267,77 +230,7 @@ const StressRelief = () => {
     );
   }
 
-  // CHAT PHASE (moderate-chat or high-chat)
-  if (phase === 'moderate-chat' || phase === 'high-chat') {
-    return (
-      <div className="min-h-screen page-gradient flex flex-col">
-        <div className="px-5 pt-6 pb-3 flex items-center gap-3">
-          <button onClick={() => setPhase('slider')} className="text-muted-foreground"><ArrowLeft size={20} /></button>
-          <div className="w-9 h-9 rounded-full gradient-calm flex items-center justify-center">
-            <Bot className="text-primary-foreground" size={18} />
-          </div>
-          <div>
-            <p className="text-sm font-serif text-foreground">Wellness Coach</p>
-            <p className="text-[10px] text-muted-foreground">Stress support session</p>
-          </div>
-        </div>
 
-        <div className="flex-1 overflow-y-auto px-5 space-y-3 pb-4">
-          {chatMessages.map((msg, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-              className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {msg.role === 'assistant' && (
-                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                  <Bot size={14} className="text-primary" />
-                </div>
-              )}
-              <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card shadow-card text-foreground rounded-bl-md'
-              }`}>{msg.content}</div>
-              {msg.role === 'user' && (
-                <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
-                  <User size={14} className="text-secondary-foreground" />
-                </div>
-              )}
-            </motion.div>
-          ))}
-          {isTyping && (
-            <div className="flex gap-2 items-center">
-              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center"><Bot size={14} className="text-primary" /></div>
-              <div className="bg-card shadow-card rounded-2xl px-4 py-3 rounded-bl-md">
-                <div className="flex gap-1">
-                  <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-pulse" />
-                  <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-pulse [animation-delay:150ms]" />
-                  <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-pulse [animation-delay:300ms]" />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="px-5 pb-4 pt-2 border-t border-border glass">
-          <div className="flex gap-2">
-            <input
-              value={chatInput}
-              onChange={e => setChatInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && sendChat()}
-              placeholder="How are you feeling..."
-              className="flex-1 px-4 py-3 rounded-xl bg-secondary text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
-            <button onClick={() => sendChat()} disabled={!chatInput.trim()} className="w-11 h-11 rounded-xl gradient-calm flex items-center justify-center text-primary-foreground disabled:opacity-50">
-              <Send size={18} />
-            </button>
-          </div>
-          <div className="flex gap-2 mt-2">
-            <Button variant="outline" size="sm" className="rounded-lg text-xs" onClick={() => navigate('/calming')}>🫁 Calming Tools</Button>
-            <Button variant="outline" size="sm" className="rounded-lg text-xs" onClick={() => setPhase('complete')}>✓ I feel better</Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // LEGACY PHASES (breathing, affirmation, grounding) kept for direct navigation
   if (phase === 'breathing') {
     return (
       <div className="min-h-screen page-gradient flex flex-col items-center justify-center px-6 text-center">

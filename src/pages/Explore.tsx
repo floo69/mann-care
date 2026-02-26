@@ -1,14 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { FadeIn } from '@/components/Animations';
-import { Brain, Wind, MessageCircle, Zap, Scale, Activity, HeartPulse, BookHeart } from 'lucide-react';
+import { Brain, Wind, Zap, Scale, Activity, HeartPulse, BookHeart } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const categories = [
   { icon: Activity, label: 'Clinical Mode', desc: 'Dental procedure support', to: '/clinical', gradient: 'gradient-calm' },
   { icon: HeartPulse, label: 'Mental First Aid', desc: 'Immediate emotional support', to: '/assessment', gradient: 'gradient-warm' },
   { icon: Wind, label: 'Calming Tools', desc: 'Breathing & grounding', to: '/calming', gradient: 'gradient-mint' },
-  { icon: MessageCircle, label: 'AI Coach', desc: 'Talk to your wellness coach', to: '/coach', gradient: 'gradient-calm' },
   { icon: Zap, label: 'Stress Relief', desc: 'Quick emergency calm', to: '/stress-relief', gradient: 'gradient-warm' },
   { icon: Scale, label: 'Work-Life Balance', desc: 'Boundaries & burnout', to: '/work-life', gradient: 'gradient-mint' },
   { icon: BookHeart, label: 'Resources', desc: 'Helplines & crisis support', to: '/resources', gradient: 'gradient-warm' },

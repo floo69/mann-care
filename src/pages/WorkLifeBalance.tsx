@@ -180,22 +180,9 @@ const WorkLifeBalance = () => {
             {/* Burnout Prediction */}
             <div className="bg-card rounded-2xl p-5 shadow-card space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-foreground">Weekly Burnout Risk</h3>
-                <span className={`text-xs font-bold px-2 py-1 rounded-full ${burnoutScore > 65 ? 'bg-destructive/10 text-destructive' : burnoutScore > 40 ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary'}`}>
-                  {burnoutLevel}
-                </span>
+                <h3 className="text-sm font-semibold text-foreground">Weekly Overview</h3>
               </div>
 
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-foreground">Burnout Risk</span>
-                  <span className={`font-medium ${burnoutColor}`}>{Math.round(burnoutScore)}%</span>
-                </div>
-                <div className="h-3 bg-secondary rounded-full overflow-hidden">
-                  <motion.div initial={{ width: 0 }} animate={{ width: `${burnoutScore}%` }} transition={{ duration: 1 }}
-                    className={`h-full rounded-full ${burnoutScore > 65 ? 'bg-destructive' : burnoutScore > 40 ? 'bg-warning' : 'bg-primary'}`} />
-                </div>
-              </div>
 
               <div>
                 <div className="flex justify-between text-xs mb-1">
@@ -210,16 +197,31 @@ const WorkLifeBalance = () => {
 
               {/* Mini chart */}
               <div>
-                <p className="text-xs text-muted-foreground mb-2">Weekly Overview</p>
-                <div className="flex items-end gap-2 h-20">
-                  {weeklyLogs.map((log, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                      <div className="w-full rounded-t-md bg-primary/20 relative" style={{ height: `${(log.mood / 5) * 100}%` }}>
-                        <div className="absolute bottom-0 w-full rounded-t-md bg-primary" style={{ height: `${(log.sleepHours / 12) * 100}%` }} />
+                <p className="text-xs text-muted-foreground mb-3">Weekly Overview</p>
+                <div className="flex gap-2">
+                  {weeklyLogs.map((log, i) => {
+                    const moodEmoji = log.mood >= 4 ? '😊' : log.mood === 3 ? '😐' : '😟';
+                    const barHeight = Math.max(20, (log.mood / 5) * 72);
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                        <span className="text-sm">{moodEmoji}</span>
+                        <div className="w-full flex flex-col justify-end" style={{ height: 72 }}>
+                          <div className="w-full rounded-t-lg bg-primary/20 relative overflow-hidden" style={{ height: barHeight }}>
+                            <div
+                              className="absolute bottom-0 w-full rounded-t-lg bg-primary"
+                              style={{ height: `${(log.sleepHours / 12) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                        <span className="text-[9px] font-medium text-foreground">{log.date}</span>
+                        <span className="text-[9px] text-muted-foreground flex items-center gap-0.5">🌙{log.sleepHours}h</span>
                       </div>
-                      <span className="text-[9px] text-muted-foreground">{log.date}</span>
-                    </div>
-                  ))}
+                    );
+                  })}
+                </div>
+                <div className="flex items-center gap-3 mt-3">
+                  <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-sm bg-primary" /><span className="text-[10px] text-muted-foreground">Sleep</span></div>
+                  <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-sm bg-primary/20" /><span className="text-[10px] text-muted-foreground">Mood</span></div>
                 </div>
               </div>
 

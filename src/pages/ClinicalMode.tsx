@@ -19,13 +19,18 @@ const dentalProcedures = [
   'Hemisection',
 ];
 
-// YouTube tutorial links per procedure (only those that have one)
+// YouTube tutorial links per procedure
 const youtubeLinks: Record<string, string> = {
   'Principles of Suturing': 'https://youtu.be/NKjQiILT7uc?si=RRDundGVn8SgHquQ',
   'Restoration (Filling / Cement)': 'https://youtu.be/KuZImX8p4DQ?si=qj2D6RxzSmH43roe',
+  'Tooth Removal in a Child': 'https://youtube.com/shorts/VhF7XjKAvqo?si=iWp3vo0FcVxAIwNL',
   'Injection Technique': 'https://youtu.be/Cr3A2hRt_wI?si=s0Q3T3WF61sxi-78',
+  'Complications of Dental Implants': 'https://www.youtube.com/results?search_query=dental+implant+complications+tutorial',
   'Jaw Relation': 'https://youtu.be/Rc13YCwEhEs?si=atCyv8I-dzCo1eCk',
   'Aesthetic Treatment of Front Teeth': 'https://youtu.be/eNJJRt5KLcQ?si=uk5ov5_YChYc_nIJ',
+  'Swallowed File Management': 'https://www.youtube.com/results?search_query=swallowed+dental+file+management+endodontic',
+  'Avulsion / Front Tooth Fracture (Child)': 'https://www.youtube.com/results?search_query=dental+avulsion+tooth+replantation+tutorial',
+  'Hemisection': 'https://www.youtube.com/results?search_query=hemisection+dental+procedure+tutorial',
 };
 
 // YouTube logo — red rounded rect + white play triangle
@@ -242,16 +247,14 @@ const ClinicalMode = () => {
                 <span className="truncate">{proc}</span>
               </span>
               <span className="flex items-center gap-2 flex-shrink-0 ml-2">
-                {ytLink && (
-                  <span
-                    role="button"
-                    title="Watch tutorial on YouTube"
-                    onClick={e => { e.stopPropagation(); window.open(ytLink, '_blank', 'noopener,noreferrer'); }}
-                    className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
-                  >
-                    <YouTubeIcon />
-                  </span>
-                )}
+                <span
+                  role="button"
+                  title="Watch tutorial on YouTube"
+                  onClick={e => { e.stopPropagation(); window.open(ytLink, '_blank', 'noopener,noreferrer'); }}
+                  className="opacity-70 hover:opacity-100 transition-opacity p-1 rounded"
+                >
+                  <YouTubeIcon />
+                </span>
                 <ChevronRight size={15} className="text-muted-foreground group-hover:text-primary transition-colors" />
               </span>
             </motion.button>

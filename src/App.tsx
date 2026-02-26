@@ -7,7 +7,6 @@ import { AppProvider, useAppState } from "@/context/AppContext";
 import Dashboard from "./pages/Dashboard";
 import Onboarding from "./pages/Onboarding";
 import Assessment from "./pages/Assessment";
-import AICoach from "./pages/AICoach";
 import ClinicalMode from "./pages/ClinicalMode";
 import CalmingTools from "./pages/CalmingTools";
 import StressRelief from "./pages/StressRelief";
@@ -41,7 +40,6 @@ const App = () => (
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/assessment" element={<ProtectedRoute><Assessment /></ProtectedRoute>} />
-            <Route path="/coach" element={<ProtectedRoute><AICoach /></ProtectedRoute>} />
             <Route path="/clinical" element={<ProtectedRoute><ClinicalMode /></ProtectedRoute>} />
             <Route path="/calming" element={<ProtectedRoute><CalmingTools /></ProtectedRoute>} />
             <Route path="/stress-relief" element={<ProtectedRoute><StressRelief /></ProtectedRoute>} />

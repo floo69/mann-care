@@ -1,121 +1,128 @@
 import Layout from '@/components/Layout';
 import { FadeIn } from '@/components/Animations';
-import { Phone, MapPin, Shield, ExternalLink, Heart, AlertTriangle } from 'lucide-react';
+import { Phone, ExternalLink, Heart, Wind, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-const helplines = [
-  { name: 'National Suicide Prevention Lifeline', number: '988', desc: '24/7 free & confidential support', urgent: true },
-  { name: 'Crisis Text Line', number: 'Text HOME to 741741', desc: 'Text-based crisis support', urgent: true },
-  { name: 'SAMHSA Helpline', number: '1-800-662-4357', desc: 'Substance abuse & mental health', urgent: false },
-  { name: 'Doctor Support Line', number: '1-888-409-0141', desc: 'Free mental health support for physicians', urgent: false },
-  { name: 'NAMI Helpline', number: '1-800-950-6264', desc: 'National Alliance on Mental Illness', urgent: false },
-];
-
-const crisisGuidance = [
-  'Take slow, deep breaths — in for 4, hold for 4, out for 4.',
-  'Remove yourself from the stressful environment if possible.',
-  "Call a trusted friend, colleague, or family member.",
-  'If you feel unsafe, call 988 or go to the nearest emergency room.',
-  'Remember: asking for help is a sign of strength, not weakness.',
-];
 
 const Resources = () => {
   return (
     <Layout>
-      <div className="px-5 pt-8 space-y-6">
+      <div className="px-5 pt-8 pb-28 space-y-5">
+
+        {/* Header */}
         <FadeIn>
-          <h1 className="text-2xl font-serif text-foreground">Resources</h1>
-          <p className="text-sm text-muted-foreground mt-1">Support when you need it most</p>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Heart className="text-primary" size={22} />
+            </div>
+            <div>
+              <h1 className="text-2xl font-serif text-foreground">Resources</h1>
+              <p className="text-xs text-muted-foreground">Support when you need it most</p>
+            </div>
+          </div>
         </FadeIn>
 
-        {/* Crisis Banner */}
+        {/* Emergency banner */}
         <FadeIn delay={0.05}>
-          <div className="bg-destructive/10 rounded-2xl p-4 border border-destructive/20">
-            <div className="flex items-center gap-2 mb-2">
-              <AlertTriangle size={18} className="text-destructive" />
-              <p className="text-sm font-semibold text-foreground">In immediate danger?</p>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-destructive/20 via-destructive/10 to-transparent border border-destructive/25 p-5">
+            <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-destructive/10 -translate-y-6 translate-x-6" />
+            <div className="flex items-center gap-2 mb-1">
+              <Shield size={16} className="text-destructive" />
+              <p className="text-sm font-semibold text-foreground">Crisis Helpline — India</p>
             </div>
-            <p className="text-xs text-muted-foreground mb-3">
-              If you or someone else is in immediate danger, call emergency services (911) right away.
+            <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+              If you're experiencing thoughts of suicide or self-harm, please reach out immediately. You are not alone. Help is available 24/7.
             </p>
             <motion.a
-              href="tel:911"
-              className="inline-flex items-center gap-2 bg-destructive text-destructive-foreground px-4 py-2 rounded-xl text-sm font-semibold"
-              whileTap={{ scale: 0.95 }}
+              href="tel:9152987821"
+              whileTap={{ scale: 0.96 }}
+              className="inline-flex items-center gap-2.5 bg-destructive text-white px-5 py-3 rounded-xl text-sm font-bold shadow-lg"
             >
-              <Phone size={14} /> Call 911
+              <Phone size={16} />
+              iCall — 9152987821
+            </motion.a>
+            <p className="text-[10px] text-muted-foreground mt-3">iCall · Tata Institute of Social Sciences · Confidential &amp; Free</p>
+          </div>
+        </FadeIn>
+
+        {/* Meditation & Relaxation */}
+        <FadeIn delay={0.1}>
+          <div className="relative overflow-hidden bg-card rounded-2xl shadow-card p-5">
+            {/* Decorative orb */}
+            <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-primary/5 -translate-y-10 translate-x-10" />
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 rounded-2xl gradient-calm flex items-center justify-center shadow-soft">
+                <Wind className="text-primary-foreground" size={20} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Meditation &amp; Relaxation</p>
+                <p className="text-xs text-muted-foreground">Guided session to calm your mind</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+              A curated guided meditation session designed to help healthcare professionals decompress, reset, and restore inner peace. Take just 10 minutes for yourself.
+            </p>
+
+            <motion.a
+              href="https://share.google/y2oj5ZRgFg0mteDGW"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.01 }}
+              className="flex items-center justify-between w-full bg-primary/8 hover:bg-primary/12 border border-primary/20 rounded-xl px-4 py-3.5 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🧘</span>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-foreground">Open Meditation Session</p>
+                  <p className="text-[10px] text-muted-foreground">Tap to open · Opens in browser</p>
+                </div>
+              </div>
+              <ExternalLink size={16} className="text-primary flex-shrink-0" />
             </motion.a>
           </div>
         </FadeIn>
 
-        {/* Helplines */}
-        <FadeIn delay={0.1}>
-          <div className="space-y-3">
-            <h2 className="text-base font-serif text-foreground">Mental Health Helplines</h2>
-            {helplines.map(({ name, number, desc, urgent }, i) => (
+        {/* Quick steps card */}
+        <FadeIn delay={0.15}>
+          <div className="bg-card rounded-2xl shadow-card p-5 space-y-3">
+            <p className="text-sm font-semibold text-foreground">If you're struggling right now</p>
+            {[
+              { emoji: '🫁', text: 'Breathe slowly — 4 counts in, hold 4, out 4' },
+              { emoji: '🚶', text: 'Step away from the stressful environment' },
+              { emoji: '📞', text: 'Call iCall: 9152987821 (free & confidential)' },
+              { emoji: '💬', text: 'Talk to a trusted colleague or friend' },
+            ].map((item, i) => (
               <motion.div
-                key={name}
-                className={`bg-card rounded-2xl p-4 shadow-card ${urgent ? 'ring-1 ring-accent/20' : ''}`}
-                whileTap={{ scale: 0.98 }}
+                key={i}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 + i * 0.07 }}
+                className="flex items-start gap-3"
               >
-                <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${urgent ? 'bg-accent/10' : 'bg-primary/10'}`}>
-                    <Phone size={18} className={urgent ? 'text-accent' : 'text-primary'} />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-foreground">{name}</p>
-                    <p className="text-xs text-primary font-medium mt-0.5">{number}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
-                  </div>
-                </div>
+                <span className="text-lg flex-shrink-0 mt-0.5">{item.emoji}</span>
+                <p className="text-sm text-foreground leading-relaxed">{item.text}</p>
               </motion.div>
             ))}
           </div>
         </FadeIn>
 
-        {/* Crisis Guidance */}
-        <FadeIn delay={0.15}>
-          <div className="glass rounded-2xl p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              <Shield size={16} className="text-primary" />
-              <h2 className="text-base font-serif text-foreground">Crisis Guidance</h2>
-            </div>
-            <div className="space-y-2.5">
-              {crisisGuidance.map((tip, i) => (
-                <div key={i} className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-[10px] font-bold text-primary">{i + 1}</span>
-                  </div>
-                  <p className="text-sm text-foreground leading-relaxed">{tip}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </FadeIn>
-
-        {/* Nearby Support (Future Ready) */}
+        {/* Affirming footer card */}
         <FadeIn delay={0.2}>
-          <div className="bg-card rounded-2xl p-4 shadow-card">
-            <div className="flex items-center gap-2 mb-2">
-              <MapPin size={16} className="text-info" />
-              <p className="text-sm font-semibold text-foreground">Nearby Support</p>
+          <div className="rounded-2xl gradient-calm p-5 text-center relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-2 left-4 w-16 h-16 rounded-full bg-white" />
+              <div className="absolute bottom-2 right-4 w-10 h-10 rounded-full bg-white" />
             </div>
-            <p className="text-xs text-muted-foreground">
-              Location-based mental health centers and support groups coming soon. We're building this feature to connect you with local resources.
+            <Heart size={28} className="text-primary-foreground mx-auto mb-2 opacity-90" />
+            <p className="text-base font-serif text-primary-foreground font-semibold">You are not alone.</p>
+            <p className="text-xs text-primary-foreground/80 mt-1 leading-relaxed max-w-xs mx-auto">
+              Reaching out is the bravest thing you can do. These resources exist for you, always.
             </p>
           </div>
         </FadeIn>
 
-        {/* Supportive message */}
-        <FadeIn delay={0.25}>
-          <div className="glass rounded-2xl p-5 text-center">
-            <Heart size={24} className="text-accent mx-auto mb-2" />
-            <p className="text-sm font-medium text-foreground">You are not alone</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Reaching out is a brave step. These resources are here for you anytime.
-            </p>
-          </div>
-        </FadeIn>
       </div>
     </Layout>
   );
