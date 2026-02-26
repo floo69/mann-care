@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { FadeIn } from '@/components/Animations';
 import { useAppState, JournalEntry } from '@/context/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PenLine, Sparkles, X, BookOpen, ChevronRight, Smile, Meh, Frown, SmilePlus, Angry } from 'lucide-react';
+import { PenLine, Sparkles, X, BookOpen, ChevronRight, Smile, Meh, Frown, SmilePlus, Angry, Heart, AlertTriangle, Wind } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 
@@ -47,13 +48,45 @@ const getDates = () => {
   return dates;
 };
 
+// ── Supportive quotes for moderate stress (50–80) ──────────────────────────
+const MODERATE_QUOTES = [
+  "You're carrying a lot right now — that's okay. Even storms pass. 🌤️",
+  "Every breath you take is a small act of courage. You're doing better than you think. 💚",
+  "Feeling the pressure means you care. Let's channel that into calm. 🌿",
+  "It's okay to pause. Your wellbeing matters as much as your patients'. 💛",
+  "You can't pour from an empty cup. Let's refill yours. 🫧",
+];
+
+// ── Concerned prompts for high stress (80–100) ─────────────────────────────
+const HIGH_STRESS_QUOTES = [
+  "We hear you. This level of stress deserves real support — don't carry this alone. 🤝",
+  "Your mental health is a priority. Please reach out — help is there for you. ❤️",
+  "You matter beyond your role. Let's get you the support you need right now. 💜",
+];
+
+/** Picks a random item from an array */
+const pickRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+/** Determine the stress tier from the emotions slider */
+function getStressTier(stress: number): 'normal' | 'moderate' | 'high' {
+  if (stress >= 80) return 'high';
+  if (stress >= 50) return 'moderate';
+  return 'normal';
+}
+
 const Journal = () => {
   const { journalEntries, addJournalEntry, moods, addMood } = useAppState();
-  const [step, setStep] = useState<'idle' | 'emotions' | 'writing'>('idle');
+  const navigate = useNavigate();
+
+  const [step, setStep] = useState<'idle' | 'emotions' | 'nudge' | 'writing'>('idle');
   const [text, setText] = useState('');
   const [emotions, setEmotions] = useState<Record<string, number>>({
     stress: 50, anxiety: 50, calm: 50, energy: 50, focus: 50,
   });
+  const [nudgeData, setNudgeData] = useState<{
+    tier: 'moderate' | 'high';
+    quote: string;
+  } | null>(null);
 
   const currentPrompt = prompts[Math.floor(Math.random() * prompts.length)];
   const dates = getDates();
@@ -63,13 +96,27 @@ const Journal = () => {
     setEmotions(prev => ({ ...prev, [key]: value[0] }));
   };
 
+  // ── Called when user taps "Continue" after setting sliders ────────────────
+  const handleEmotionsContinue = () => {
+    const tier = getStressTier(emotions.stress);
+    if (tier === 'moderate') {
+      setNudgeData({ tier, quote: pickRandom(MODERATE_QUOTES) });
+      setStep('nudge');
+    } else if (tier === 'high') {
+      setNudgeData({ tier, quote: pickRandom(HIGH_STRESS_QUOTES) });
+      setStep('nudge');
+    } else {
+      // Normal stress — go straight to writing
+      setStep('writing');
+    }
+  };
+
   const save = () => {
     if (!text.trim()) return;
     const overallMood = Math.round(
       ((100 - emotions.stress) + (100 - emotions.anxiety) + emotions.calm + emotions.energy + emotions.focus) / 100
     );
     const moodValue = Math.max(1, Math.min(5, overallMood));
-    
     const entry: JournalEntry = {
       id: Date.now().toString(),
       date: new Date().toISOString().split('T')[0],
@@ -108,7 +155,8 @@ const Journal = () => {
         </FadeIn>
 
         <AnimatePresence mode="wait">
-          {/* Step 1: Emotion Setup */}
+
+          {/* ── Step 1: Emotion Sliders ─────────────────────────────────────── */}
           {step === 'emotions' && (
             <motion.div
               key="emotions"
@@ -128,7 +176,7 @@ const Journal = () => {
               </div>
 
               <div className="space-y-5">
-                {emotionSliders.map(({ key, label, color }) => (
+                {emotionSliders.map(({ key, label }) => (
                   <div key={key} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-foreground">{label}</span>
@@ -146,7 +194,7 @@ const Journal = () => {
               </div>
 
               <Button
-                onClick={() => setStep('writing')}
+                onClick={handleEmotionsContinue}
                 className="w-full rounded-xl py-5 gradient-calm border-none text-primary-foreground"
               >
                 Continue <ChevronRight size={16} className="ml-1" />
@@ -154,7 +202,85 @@ const Journal = () => {
             </motion.div>
           )}
 
-          {/* Step 2: Journal Writing */}
+          {/* ── Step: Nudge card (moderate or high stress) ─────────────────── */}
+          {step === 'nudge' && nudgeData && (
+            <motion.div
+              key="nudge"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className={`rounded-2xl p-6 space-y-5 ${nudgeData.tier === 'high'
+                  ? 'bg-destructive/10 border border-destructive/25'
+                  : 'bg-primary/8 border border-primary/20'
+                }`}
+            >
+              {/* Icon */}
+              <div className="flex justify-center">
+                <motion.div
+                  animate={{ scale: [1, 1.12, 1] }}
+                  transition={{ duration: 2.5, repeat: Infinity }}
+                  className={`w-16 h-16 rounded-full flex items-center justify-center ${nudgeData.tier === 'high' ? 'bg-destructive/15' : 'bg-primary/10'
+                    }`}
+                >
+                  {nudgeData.tier === 'high'
+                    ? <AlertTriangle size={30} className="text-destructive" />
+                    : <Heart size={30} className="text-primary" />
+                  }
+                </motion.div>
+              </div>
+
+              {/* Quote / message */}
+              <div className="text-center space-y-1">
+                <p className={`text-base font-serif leading-relaxed ${nudgeData.tier === 'high' ? 'text-destructive' : 'text-foreground'
+                  }`}>
+                  {nudgeData.tier === 'high' ? 'We noticed your stress is very high.' : 'You seem to be under some pressure.'}
+                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed px-2">
+                  {nudgeData.quote}
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="space-y-2">
+                {nudgeData.tier === 'moderate' ? (
+                  <>
+                    <Button
+                      onClick={() => navigate('/calming')}
+                      className="w-full rounded-xl py-4 gradient-calm border-none text-primary-foreground font-semibold"
+                    >
+                      <Wind size={16} className="mr-2" />
+                      Try a Calming Exercise
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setStep('writing')}
+                      className="w-full rounded-xl py-4"
+                    >
+                      Continue to Journal
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      onClick={() => navigate('/resources')}
+                      className="w-full rounded-xl py-4 bg-destructive text-white border-none font-semibold hover:bg-destructive/90"
+                    >
+                      View Support Resources
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setStep('writing')}
+                      className="w-full rounded-xl py-4 text-muted-foreground"
+                    >
+                      I'm okay, continue anyway
+                    </Button>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── Step 2: Journal Writing ─────────────────────────────────────── */}
           {step === 'writing' && (
             <motion.div
               key="writing"
@@ -191,6 +317,7 @@ const Journal = () => {
               </Button>
             </motion.div>
           )}
+
         </AnimatePresence>
 
         {/* Mood Timeline */}
@@ -205,7 +332,6 @@ const Journal = () => {
                   const isToday = dateStr === today;
                   const dayName = date.toLocaleDateString('en', { weekday: 'short' }).slice(0, 2);
                   const dayNum = date.getDate();
-
                   return (
                     <div
                       key={dateStr}
@@ -248,9 +374,7 @@ const Journal = () => {
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-xs text-muted-foreground">{entry.date}</p>
                     {entry.mood && (
-                      <span className="text-xs">
-                        {moodIcons[entry.mood - 1]?.emoji}
-                      </span>
+                      <span className="text-xs">{moodIcons[entry.mood - 1]?.emoji}</span>
                     )}
                   </div>
                   <p className="text-sm text-foreground line-clamp-3">{entry.text}</p>
