@@ -6,124 +6,127 @@
 
 @layer base {
   :root {
-    --background: 270 30% 98%;
-    --foreground: 260 20% 20%;
+    /* Clinical neutral base */
+    --background: 210 20% 97%;
+    --foreground: 215 30% 14%;
 
-    --card: 270 25% 99%;
-    --card-foreground: 260 20% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 30% 14%;
 
-    --popover: 270 25% 99%;
-    --popover-foreground: 260 20% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 30% 14%;
 
-    --primary: 260 50% 65%;
+    /* Primary: deep clinical blue-indigo */
+    --primary: 221 65% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 30% 94%;
-    --secondary-foreground: 260 30% 40%;
+    /* Secondary: cool slate */
+    --secondary: 210 18% 93%;
+    --secondary-foreground: 215 25% 35%;
 
-    --muted: 270 20% 96%;
-    --muted-foreground: 260 10% 55%;
+    --muted: 210 15% 95%;
+    --muted-foreground: 215 12% 52%;
 
-    --accent: 340 50% 75%;
-    --accent-foreground: 340 50% 25%;
+    /* Accent: teal — 1 clean accent only */
+    --accent: 174 60% 38%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 55% 60%;
+    --destructive: 0 68% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 270 15% 92%;
-    --input: 270 15% 92%;
-    --ring: 260 50% 65%;
+    --border: 210 14% 89%;
+    --input: 210 14% 89%;
+    --ring: 221 65% 40%;
 
-    --radius: 1rem;
+    /* Tighter radius for clinical feel */
+    --radius: 0.625rem;
 
-    --sidebar-background: 270 25% 98%;
-    --sidebar-foreground: 260 20% 30%;
-    --sidebar-primary: 260 50% 65%;
+    --sidebar-background: 210 20% 97%;
+    --sidebar-foreground: 215 30% 20%;
+    --sidebar-primary: 221 65% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 30% 95%;
-    --sidebar-accent-foreground: 260 20% 20%;
-    --sidebar-border: 270 15% 92%;
-    --sidebar-ring: 260 50% 65%;
+    --sidebar-accent: 210 18% 93%;
+    --sidebar-accent-foreground: 215 30% 14%;
+    --sidebar-border: 210 14% 89%;
+    --sidebar-ring: 221 65% 40%;
 
-    /* Pastel palette tokens */
-    --pastel-lavender: 260 50% 85%;
-    --pastel-mint: 158 40% 85%;
-    --pastel-blue: 210 50% 85%;
-    --pastel-peach: 20 60% 88%;
-    --pastel-pink: 340 45% 88%;
-    --pastel-beige: 35 30% 92%;
+    /* Clinical colour tokens */
+    --clinical-blue-50: 214 100% 97%;
+    --clinical-blue-100: 214 95% 93%;
+    --clinical-teal-50: 174 60% 96%;
 
-    /* Custom tokens */
-    --calm-gradient: linear-gradient(135deg, hsl(260, 50%, 75%), hsl(210, 50%, 80%));
-    --warm-gradient: linear-gradient(135deg, hsl(340, 50%, 80%), hsl(20, 60%, 85%));
-    --mint-gradient: linear-gradient(135deg, hsl(158, 40%, 80%), hsl(180, 35%, 85%));
-    --soft-shadow: 0 8px 32px -6px hsl(260 30% 50% / 0.1);
-    --card-shadow: 0 2px 16px -2px hsl(260 30% 50% / 0.06);
-    --elevated-shadow: 0 12px 40px -8px hsl(260 50% 65% / 0.15);
+    /* Gradients — replaced pink/pastel with slate-blue and teal */
+    --calm-gradient: linear-gradient(135deg, hsl(221, 65%, 40%), hsl(221, 55%, 52%));
+    --warm-gradient: linear-gradient(135deg, hsl(215, 55%, 28%), hsl(221, 60%, 40%));
+    --mint-gradient: linear-gradient(135deg, hsl(174, 60%, 38%), hsl(174, 50%, 50%));
 
-    /* Page gradients */
-    --page-gradient: linear-gradient(180deg, hsl(270, 30%, 97%) 0%, hsl(260, 25%, 98%) 30%, hsl(210, 30%, 97%) 60%, hsl(340, 20%, 98%) 100%);
-    --page-gradient-clinical: linear-gradient(180deg, hsl(210, 35%, 96%) 0%, hsl(260, 20%, 97%) 50%, hsl(270, 25%, 98%) 100%);
-    --page-gradient-calm: linear-gradient(180deg, hsl(158, 30%, 96%) 0%, hsl(210, 25%, 97%) 50%, hsl(270, 20%, 98%) 100%);
+    --soft-shadow: 0 8px 32px -6px hsl(215 40% 30% / 0.10);
+    --card-shadow: 0 2px 12px -2px hsl(215 30% 30% / 0.07);
+    --elevated-shadow: 0 12px 40px -8px hsl(221 65% 40% / 0.18);
 
-    /* Glassmorphism */
-    --glass-bg: hsl(270 30% 100% / 0.6);
-    --glass-border: hsl(270 30% 95% / 0.7);
-    --glass-shadow: 0 4px 24px -4px hsl(260 30% 50% / 0.06);
+    /* Page background: clean off-white with subtle cool tint */
+    --page-gradient: linear-gradient(180deg, hsl(210, 22%, 97%) 0%, hsl(214, 18%, 98%) 50%, hsl(210, 15%, 97%) 100%);
+    --page-gradient-clinical: linear-gradient(180deg, hsl(210, 30%, 96%) 0%, hsl(215, 20%, 97%) 100%);
+    --page-gradient-calm: linear-gradient(180deg, hsl(174, 25%, 96%) 0%, hsl(210, 20%, 97%) 100%);
 
-    --success: 158 45% 50%;
+    /* Glassmorphism — cool tinted */
+    --glass-bg: hsl(210 30% 100% / 0.65);
+    --glass-border: hsl(210 20% 90% / 0.8);
+    --glass-shadow: 0 4px 24px -4px hsl(215 30% 30% / 0.07);
+
+    --success: 158 60% 36%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 80% 60%;
-    --warning-foreground: 38 80% 15%;
-    --info: 210 55% 60%;
+    --warning: 38 90% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 210 75% 45%;
     --info-foreground: 0 0% 100%;
   }
 
   .dark {
-    --background: 260 20% 10%;
-    --foreground: 270 20% 92%;
+    --background: 220 22% 10%;
+    --foreground: 210 20% 90%;
 
-    --card: 260 20% 13%;
-    --card-foreground: 270 20% 92%;
+    --card: 220 22% 13%;
+    --card-foreground: 210 20% 90%;
 
-    --popover: 260 20% 13%;
-    --popover-foreground: 270 20% 92%;
+    --popover: 220 22% 13%;
+    --popover-foreground: 210 20% 90%;
 
-    --primary: 260 45% 60%;
+    --primary: 221 65% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 260 20% 18%;
-    --secondary-foreground: 260 30% 75%;
+    --secondary: 220 18% 18%;
+    --secondary-foreground: 210 20% 70%;
 
-    --muted: 260 15% 16%;
-    --muted-foreground: 260 10% 60%;
+    --muted: 220 15% 16%;
+    --muted-foreground: 210 10% 58%;
 
-    --accent: 340 40% 55%;
-    --accent-foreground: 340 40% 90%;
+    --accent: 174 55% 45%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 55% 35%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 60% 40%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 260 15% 20%;
-    --input: 260 15% 20%;
-    --ring: 260 45% 60%;
+    --border: 220 14% 20%;
+    --input: 220 14% 20%;
+    --ring: 221 65% 55%;
 
-    --sidebar-background: 260 20% 10%;
-    --sidebar-foreground: 270 20% 92%;
-    --sidebar-primary: 260 45% 60%;
+    --sidebar-background: 220 22% 10%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 221 65% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 260 20% 16%;
-    --sidebar-accent-foreground: 270 20% 92%;
-    --sidebar-border: 260 15% 20%;
-    --sidebar-ring: 260 45% 60%;
+    --sidebar-accent: 220 18% 16%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 220 14% 20%;
+    --sidebar-ring: 221 65% 55%;
 
-    --page-gradient: linear-gradient(180deg, hsl(260, 20%, 10%) 0%, hsl(260, 18%, 11%) 50%, hsl(260, 15%, 10%) 100%);
-    --page-gradient-clinical: linear-gradient(180deg, hsl(210, 15%, 11%) 0%, hsl(260, 18%, 10%) 100%);
-    --page-gradient-calm: linear-gradient(180deg, hsl(158, 10%, 11%) 0%, hsl(260, 18%, 10%) 100%);
-    
-    --glass-bg: hsl(260 20% 13% / 0.7);
-    --glass-border: hsl(260 15% 22% / 0.5);
-    --glass-shadow: 0 4px 24px -4px hsl(0 0% 0% / 0.2);
+    --page-gradient: linear-gradient(180deg, hsl(220, 22%, 10%) 0%, hsl(220, 20%, 11%) 50%, hsl(220, 18%, 10%) 100%);
+    --page-gradient-clinical: linear-gradient(180deg, hsl(215, 18%, 11%) 0%, hsl(220, 20%, 10%) 100%);
+    --page-gradient-calm: linear-gradient(180deg, hsl(174, 12%, 11%) 0%, hsl(220, 20%, 10%) 100%);
+
+    --glass-bg: hsl(220 22% 14% / 0.75);
+    --glass-border: hsl(220 15% 24% / 0.55);
+    --glass-shadow: 0 4px 24px -4px hsl(0 0% 0% / 0.25);
   }
 }
 

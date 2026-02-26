@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppState } from '@/context/AppContext';
-import { Heart, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Activity, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 
@@ -27,7 +27,7 @@ const Auth = () => {
     }
 
     if (mode === 'signup' && password !== confirmPassword) {
-      toast({ title: 'Passwords don\'t match', variant: 'destructive' });
+      toast({ title: "Passwords don't match", variant: 'destructive' });
       return;
     }
 
@@ -38,7 +38,7 @@ const Auth = () => {
 
     login(email);
     toast({ title: mode === 'signup' ? 'Account created!' : 'Welcome back!', description: 'Redirecting...' });
-    
+
     if (profile.onboarded) {
       navigate('/');
     } else {
@@ -46,71 +46,71 @@ const Auth = () => {
     }
   };
 
+  const inputClass =
+    'w-full pl-11 pr-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm transition-all';
+
   return (
-    <div className="min-h-screen page-gradient flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm"
       >
-        {/* Logo */}
+        {/* Wordmark */}
         <div className="flex flex-col items-center mb-10">
-          <motion.div
-            className="w-20 h-20 rounded-3xl gradient-calm flex items-center justify-center shadow-elevated mb-4"
-            animate={{ scale: [1, 1.04, 1] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          >
-            <Heart className="text-primary-foreground" size={34} />
-          </motion.div>
-          <h1 className="text-3xl font-serif text-foreground">Mann Care</h1>
-          <p className="text-sm text-muted-foreground mt-1">Your calm companion</p>
+          <div className="w-14 h-14 rounded-xl gradient-calm flex items-center justify-center shadow-elevated mb-4">
+            <Activity className="text-primary-foreground" size={26} />
+          </div>
+          <h1 className="text-2xl font-serif text-foreground tracking-tight">Mann Care</h1>
+          <p className="text-xs text-muted-foreground mt-1 tracking-wide uppercase">
+            Clinician Wellness Platform
+          </p>
         </div>
 
-        {/* Form */}
+        {/* Form card */}
         <AnimatePresence mode="wait">
           <motion.form
             key={mode}
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.25 }}
+            exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.2 }}
             onSubmit={handleSubmit}
-            className="space-y-4"
           >
-            <div className="glass rounded-2xl p-6 space-y-4">
-              <h2 className="text-xl font-serif text-foreground text-center">
-                {mode === 'signin' ? 'Welcome back' : mode === 'signup' ? 'Create account' : 'Reset password'}
+            <div className="bg-card border border-border rounded-xl p-6 shadow-card space-y-4">
+              <h2 className="text-lg font-semibold text-foreground">
+                {mode === 'signin' ? 'Sign in to your account' : mode === 'signup' ? 'Create an account' : 'Reset your password'}
               </h2>
 
               {/* Email */}
               <div className="relative">
-                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="Email address"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm transition-all"
+                  className={inputClass}
                 />
               </div>
 
               {/* Password */}
               {mode !== 'forgot' && (
                 <div className="relative">
-                  <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Lock size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="Password"
-                    className="w-full pl-11 pr-11 py-3 rounded-xl bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm transition-all"
+                    className={`${inputClass} pr-11`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
               )}
@@ -118,51 +118,53 @@ const Auth = () => {
               {/* Confirm password */}
               {mode === 'signup' && (
                 <div className="relative">
-                  <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Lock size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={e => setConfirmPassword(e.target.value)}
                     placeholder="Confirm password"
-                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm transition-all"
+                    className={inputClass}
                   />
                 </div>
               )}
 
-              {/* Forgot password link */}
+              {/* Forgot link */}
               {mode === 'signin' && (
-                <button
-                  type="button"
-                  onClick={() => setMode('forgot')}
-                  className="text-xs text-primary hover:underline"
-                >
-                  Forgot password?
-                </button>
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setMode('forgot')}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
               )}
 
               <Button
                 type="submit"
-                className="w-full rounded-xl py-6 gradient-calm border-none text-primary-foreground font-medium"
+                className="w-full gradient-calm border-none text-primary-foreground font-semibold rounded-lg py-5"
               >
                 {mode === 'signin' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Send Reset Link'}
-                <ArrowRight size={16} className="ml-2" />
+                <ArrowRight size={15} className="ml-2" />
               </Button>
             </div>
           </motion.form>
         </AnimatePresence>
 
-        {/* Toggle */}
-        <div className="text-center mt-6">
+        {/* Toggle footer */}
+        <div className="text-center mt-5">
           {mode === 'forgot' ? (
-            <button onClick={() => setMode('signin')} className="text-sm text-muted-foreground">
+            <button onClick={() => setMode('signin')} className="text-sm text-muted-foreground hover:text-foreground">
               Back to <span className="text-primary font-medium">Sign In</span>
             </button>
           ) : mode === 'signin' ? (
-            <button onClick={() => setMode('signup')} className="text-sm text-muted-foreground">
-              Don't have an account? <span className="text-primary font-medium">Sign Up</span>
+            <button onClick={() => setMode('signup')} className="text-sm text-muted-foreground hover:text-foreground">
+              No account? <span className="text-primary font-medium">Create one</span>
             </button>
           ) : (
-            <button onClick={() => setMode('signin')} className="text-sm text-muted-foreground">
+            <button onClick={() => setMode('signin')} className="text-sm text-muted-foreground hover:text-foreground">
               Already have an account? <span className="text-primary font-medium">Sign In</span>
             </button>
           )}

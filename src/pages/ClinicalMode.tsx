@@ -7,35 +7,197 @@ import { Button } from '@/components/ui/button';
 import { Search, ChevronRight, AlertTriangle, CheckCircle, Heart, Wind, Smile, ArrowLeft, PartyPopper } from 'lucide-react';
 
 const dentalProcedures = [
-  'Root Canal',
-  'Tooth Extraction',
-  'Dental Implant',
-  'Scaling & Polishing',
-  'Crown Placement',
-  'Wisdom Tooth Removal',
-  'Filling Restoration',
+  'Principles of Suturing',
+  'Restoration (Filling / Cement)',
+  'Tooth Removal in a Child',
+  'Injection Technique',
+  'Complications of Dental Implants',
+  'Jaw Relation',
+  'Aesthetic Treatment of Front Teeth',
+  'Swallowed File Management',
+  'Avulsion / Front Tooth Fracture (Child)',
+  'Hemisection',
 ];
 
+// YouTube tutorial links per procedure (only those that have one)
+const youtubeLinks: Record<string, string> = {
+  'Principles of Suturing': 'https://youtu.be/NKjQiILT7uc?si=RRDundGVn8SgHquQ',
+  'Restoration (Filling / Cement)': 'https://youtu.be/KuZImX8p4DQ?si=qj2D6RxzSmH43roe',
+  'Injection Technique': 'https://youtu.be/Cr3A2hRt_wI?si=s0Q3T3WF61sxi-78',
+  'Jaw Relation': 'https://youtu.be/Rc13YCwEhEs?si=atCyv8I-dzCo1eCk',
+  'Aesthetic Treatment of Front Teeth': 'https://youtu.be/eNJJRt5KLcQ?si=uk5ov5_YChYc_nIJ',
+};
+
+// YouTube logo — red rounded rect + white play triangle
+const YouTubeIcon = () => (
+  <svg viewBox="0 0 20 14" className="w-5 h-3.5" xmlns="http://www.w3.org/2000/svg">
+    <rect width="20" height="14" rx="3" fill="#FF0000" />
+    <path d="M8 4l5 3-5 3V4z" fill="white" />
+  </svg>
+);
+
 const complications: Record<string, string[]> = {
-  'Root Canal': ['Instrument separation', 'Perforation of the root', 'Incomplete cleaning of canals', 'Post-operative pain', 'Sodium hypochlorite accident'],
-  'Tooth Extraction': ['Dry socket (alveolar osteitis)', 'Root tip fracture', 'Excessive bleeding', 'Nerve damage (inferior alveolar)', 'Sinus communication'],
-  'Dental Implant': ['Implant failure / non-integration', 'Peri-implantitis', 'Nerve injury', 'Sinus perforation', 'Prosthetic complications'],
-  'Scaling & Polishing': ['Gingival sensitivity', 'Tooth sensitivity post-procedure', 'Minor bleeding', 'Enamel damage from over-polishing'],
-  'Crown Placement': ['Crown decementation', 'Marginal discrepancy', 'Pulp irritation', 'Aesthetic mismatch', 'Occlusal interference'],
-  'Wisdom Tooth Removal': ['Dry socket', 'Inferior alveolar nerve paresthesia', 'Lingual nerve damage', 'Jaw stiffness (trismus)', 'Infection'],
-  'Filling Restoration': ['Post-operative sensitivity', 'Secondary caries', 'Filling fracture', 'Pulp exposure', 'Improper contact point'],
-  default: ['Bleeding or hemorrhage', 'Infection at the site', 'Adverse reaction to anesthesia', 'Nerve damage', 'Patient anxiety or distress'],
+  'Principles of Suturing': [
+    'Wound dehiscence due to excessive tension on sutures',
+    'Postoperative infection or suture abscess',
+    'Tissue necrosis from over-tight knots',
+    'Haematoma formation beneath the flap',
+    'Accidental swallowing or aspiration of suture needle',
+  ],
+  'Restoration (Filling / Cement)': [
+    'Post-operative thermal or occlusal sensitivity',
+    'Secondary caries beneath the restoration',
+    'Pulp irritation or exposure during cavity prep',
+    'Restoration fracture or debonding',
+    'Poor contact point — food impaction',
+    'Colour mismatch with adjacent teeth',
+  ],
+  'Tooth Removal in a Child': [
+    'Premature loss disrupting permanent eruption sequence',
+    'Excessive bleeding or haematoma',
+    'Root tip fracture with retained fragment',
+    'Damage to permanent tooth germ below root apex',
+    'Psychological distress and needle phobia',
+  ],
+  'Injection Technique': [
+    'Intravascular injection — systemic local anaesthetic toxicity',
+    'Failed / incomplete anaesthesia',
+    'Haematoma at injection site',
+    'Trismus following inferior alveolar nerve block',
+    'Needle fracture (rare — high-gauge needles)',
+    'Transient facial nerve paralysis (parotid infiltration)',
+    'Vasovagal syncope',
+  ],
+  'Complications of Dental Implants': [
+    'Osseointegration failure / implant mobility',
+    'Peri-implantitis — infection around implant',
+    'Inferior alveolar or mental nerve damage',
+    'Sinus membrane perforation (posterior maxilla)',
+    'Prosthetic screw loosening or fracture',
+    'Crestal bone resorption',
+    'Flap necrosis and wound dehiscence',
+  ],
+  'Jaw Relation': [
+    'Incorrect vertical dimension of occlusion (VDO)',
+    'Centric relation not coinciding with centric occlusion',
+    'Face-bow transfer errors leading to articulator inaccuracy',
+    'Temporomandibular pain post-prosthesis',
+    'Phonetic problems due to incorrect OVD',
+  ],
+  'Aesthetic Treatment of Front Teeth': [
+    'Colour relapse after bleaching',
+    'Gingival irritation from bleaching agents',
+    'Veneer or composite debonding / chipping',
+    'Sensitivity following tooth preparation',
+    'Shade mismatch between restoration and teeth',
+    'Over-reduction leading to pulp exposure',
+  ],
+  'Swallowed File Management': [
+    'File aspirated into respiratory tract — respiratory emergency',
+    'Delayed diagnosis if not immediately noticed',
+    'GI perforation risk if file passes sharp end-on',
+    'Medico-legal consequences if not documented properly',
+    'Patient anxiety and loss of trust',
+  ],
+  'Avulsion / Front Tooth Fracture (Child)': [
+    'Pulp necrosis if not managed within golden hour',
+    'Root resorption — inflammatory or replacement type',
+    'Ankylosis of replanted permanent tooth',
+    'Damage to developing permanent successor (primary avulsion)',
+    'Psychological distress in child and parent',
+    'Crown-root fracture requiring extraction',
+  ],
+  'Hemisection': [
+    'Fracture of remaining root during sectioning',
+    'Periodontal compromise of retained root',
+    'Endodontic failure in treated root',
+    'Bone loss progression at furcation',
+    'Crown or bridge failure on hemisected unit',
+  ],
+  default: ['Bleeding or haemorrhage', 'Infection at the site', 'Adverse reaction to anaesthesia', 'Nerve damage', 'Patient anxiety or distress'],
 };
 
 const solutions: Record<string, string[]> = {
-  'Root Canal': ['Use apex locator & radiographs for working length', 'Seal perforation with MTA immediately', 'Ensure thorough irrigation with NaOCl and EDTA', 'Prescribe analgesics; reassure patient', 'Aspirate immediately; irrigate with saline'],
-  'Tooth Extraction': ['Place socket dressing with clove oil/alvogyl', 'Use root tip elevators carefully; consider surgical approach', 'Apply gauze pressure; use hemostatic agents', 'Warn patient pre-op; use nerve block carefully', 'Close with buccal flap; prescribe antibiotics & decongestants'],
-  'Dental Implant': ['Ensure primary stability; consider bone grafting', 'Maintain oral hygiene; debride peri-implant area', 'Map nerve position with CBCT pre-operatively', 'Use short implants or sinus lift procedure', 'Verify impression accuracy; adjust prosthesis'],
-  'Scaling & Polishing': ['Use gentle strokes; apply desensitizing agent', 'Recommend sensitivity toothpaste for 2 weeks', 'Apply pressure with gauze; use hemostatic agent', 'Use rubber cup at low speed; avoid over-polishing'],
-  'Crown Placement': ['Re-cement with appropriate luting agent', 'Adjust margins; remake if necessary', 'Use desensitizing liner; monitor symptoms', 'Communicate shade requirements with lab', 'Adjust occlusion with articulating paper'],
-  'Wisdom Tooth Removal': ['Pack socket; prescribe chlorhexidine rinse', 'Inform patient; monitor recovery over 6-8 weeks', 'Minimize lingual flap retraction', 'Prescribe muscle relaxants; warm compresses', 'Prescribe antibiotics; ensure wound irrigation'],
-  'Filling Restoration': ['Apply desensitizing agent; check occlusion', 'Ensure complete caries removal before filling', 'Use flowable composite for small repairs', 'Apply calcium hydroxide liner; consider root canal', 'Use matrix band system for proper contour'],
-  default: ['Apply direct pressure and assess hemostasis protocols', 'Follow sterile technique strictly', 'Monitor vitals continuously', 'Use anatomical landmarks carefully', 'Communicate clearly with the patient'],
+  'Principles of Suturing': [
+    'Approximate tissue — do not strangulate; use interrupted sutures intraorally',
+    'Use resorbable sutures (Vicryl / plain gut) intraorally; non-resorbable (silk) for skin',
+    'Count and account for all needles before and after closure',
+    'Irrigate wound and ensure haemostasis before final closure',
+    'For dehiscence: debride, irrigate and resuture if edges viable',
+    'Remove sutures at 5–7 days; earlier if tension is high',
+  ],
+  'Restoration (Filling / Cement)': [
+    'Remove all caries with explorer + caries detector dye before placement',
+    'Place GIC base or calcium hydroxide liner over deep cavities',
+    'Use matrix band system for accurate contact point and contour',
+    'Check and adjust occlusion with articulating paper immediately after set',
+    'For sensitivity: desensitising agent for mild; root canal evaluation if severe',
+    'Match shade under natural light on a moist tooth before isolation',
+  ],
+  'Tooth Removal in a Child': [
+    'Use topical anaesthetic before injection; warm the solution; inject very slowly',
+    'Apply Tell-Show-Do technique; use child-friendly language throughout',
+    'Apply firm gauze pressure post-extraction; observe for 15 minutes',
+    'If root tip retained near germ — leave in situ, monitor radiographically',
+    'Fit space maintainer promptly if primary molar lost prematurely',
+    'Refer for phobia management if distress is significant',
+  ],
+  'Injection Technique': [
+    'Always aspirate before injecting; inject at 1 mL/min to avoid intravascular deposit',
+    'Confirm landmarks: palpate coronoid notch for IANB; inject slightly above occlusal plane',
+    'For failed block: wait 7–10 min; supplement with intraligamentary or Gow-Gates technique',
+    'For haematoma: immediate pressure, cold pack, reassure; review in 48 hours',
+    'For syncope: recline fully, elevate legs, monitor vitals; do not leave patient unattended',
+    'Never use a bent needle; use fresh needle for each separate block',
+  ],
+  'Complications of Dental Implants': [
+    'Peri-implantitis: mechanical debridement + antiseptic irrigation; systemic antibiotics if acute',
+    'Nerve damage: CBCT pre-op to map IAN; remove/reposition implant if impinging',
+    'Sinus perforation: small tears heal spontaneously; large tears need Schneiderian membrane repair',
+    'Implant failure: remove, graft, allow 3–6 months healing then replant',
+    'Screw loosening: retighten to manufacturer torque; check and correct occlusion',
+    'Bone resorption: optimise loading & hygiene; surgical correction if structural',
+  ],
+  'Jaw Relation': [
+    'Re-establish VDO using phonetic test (closest speaking space = 2–4 mm) and Willis gauge',
+    'Confirm centric relation with Dawson bimanual manipulation technique',
+    'Use semi-adjustable articulator with accurate face-bow transfer for complex cases',
+    'For TMD post-prosthesis: fit occlusal splint; remount and adjust at 1-week review',
+    'Always complete wax try-in before final prosthesis delivery for patient approval',
+  ],
+  'Aesthetic Treatment of Front Teeth': [
+    'Bleaching: 10–16% carbamide peroxide in custom tray, nightguard technique; fluoride for sensitivity',
+    'Composite bonding: 30-sec etch, bonding agent, incremental layering for translucency',
+    'Veneers: minimal prep 0.3–0.5 mm; temporise with Protemp; verify shade with trial paste',
+    'Shade selection: assess in natural light, on moist tooth, before rubber dam isolation',
+    'Polish with sequential Sof-Lex discs for optimal surface finish and lustre',
+    'For pulp exposure risk during prep: use rubber dam, gentle burs, liner before restoration',
+  ],
+  'Swallowed File Management': [
+    'IMMEDIATE: chest + abdominal X-ray to locate the file — do not wait',
+    'If in airway (trachea / bronchus): emergency ENT referral for bronchoscopy — do NOT delay',
+    'If in oesophagus: urgent endoscopy for retrieval within hours',
+    'If in stomach (asymptomatic): conservative monitoring; serial X-rays every 24–48 hours; check stools',
+    'Document everything: time of incident, file specs, steps taken — critical medico-legally',
+    'Prevention: rubber dam always; tie floss to file; count instruments before and after use',
+  ],
+  'Avulsion / Front Tooth Fracture (Child)': [
+    'Primary tooth avulsion: do NOT replant — risk to permanent successor; fit space maintainer',
+    'Permanent tooth avulsion: replant within 30 min; store in milk or Hanks Balanced Salt Solution',
+    'Replantation: gently rinse root with saline; never scrape; splint with flexible splint 7–14 days',
+    'RCT within 2 weeks for mature apex; apexification/apexogenesis for immature open apex',
+    'Crown fracture with pulp exposure: partial pulpotomy with MTA to preserve pulp vitality',
+    'Follow-up radiographically at 1, 3, 6 months to detect root resorption early',
+  ],
+  'Hemisection': [
+    'Complete endodontic treatment of all retained roots before surgery',
+    'Use surgical bur to section vertically through furcation without damaging retained root',
+    'Raise full-thickness flap; remove affected root cleanly; smooth any sharp bony projections',
+    'Osseous recontouring to create adequate embrasure for interproximal hygiene access',
+    'Final restoration: individual crown or splinted bridge after 3 months of confirmed healing',
+    'Educate patient on meticulous interdental cleaning — essential for long-term success',
+  ],
+  default: ['Apply direct pressure and assess haemostasis', 'Follow strict sterile technique', 'Monitor vitals continuously', 'Use anatomical landmarks carefully', 'Communicate clearly with the patient'],
 };
 
 const ClinicalMode = () => {
@@ -66,20 +228,35 @@ const ClinicalMode = () => {
       </div>
 
       <div className="space-y-1.5">
-        {filteredProcedures.map(proc => (
-          <motion.button
-            key={proc}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => { setSelectedProcedure(proc); setStep(1); }}
-            className="w-full text-left px-4 py-3 rounded-xl bg-card shadow-card hover:shadow-soft hover:translate-y-[-1px] transition-all duration-300 text-sm font-medium text-foreground flex items-center justify-between"
-          >
-            <span className="flex items-center gap-2">
-              <span className="text-base">🦷</span>
-              {proc}
-            </span>
-            <ChevronRight size={16} className="text-muted-foreground" />
-          </motion.button>
-        ))}
+        {filteredProcedures.map(proc => {
+          const ytLink = youtubeLinks[proc];
+          return (
+            <motion.button
+              key={proc}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => { setSelectedProcedure(proc); setStep(1); }}
+              className="w-full text-left px-4 py-3 rounded-xl bg-card border border-border shadow-card hover:border-primary/30 transition-all duration-200 text-sm font-medium text-foreground flex items-center justify-between group"
+            >
+              <span className="flex items-center gap-2 flex-1 min-w-0">
+                <span className="text-base flex-shrink-0">🦷</span>
+                <span className="truncate">{proc}</span>
+              </span>
+              <span className="flex items-center gap-2 flex-shrink-0 ml-2">
+                {ytLink && (
+                  <span
+                    role="button"
+                    title="Watch tutorial on YouTube"
+                    onClick={e => { e.stopPropagation(); window.open(ytLink, '_blank', 'noopener,noreferrer'); }}
+                    className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
+                  >
+                    <YouTubeIcon />
+                  </span>
+                )}
+                <ChevronRight size={15} className="text-muted-foreground group-hover:text-primary transition-colors" />
+              </span>
+            </motion.button>
+          );
+        })}
       </div>
     </div>,
 

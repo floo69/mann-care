@@ -6,147 +6,228 @@ import { FadeIn } from '@/components/Animations';
 import { useAppState } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ChevronRight, Brain, BarChart3, AlertTriangle, CheckCircle } from 'lucide-react';
+import {
+  ChevronRight,
+  Brain,
+  AlertTriangle,
+  CheckCircle2,
+  Info,
+  HeartPulse,
+  Zap,
+  PhoneCall,
+} from 'lucide-react';
 
-// Perceived Stress Scale questions
-const pssQuestions = [
-  "How often have you been upset because of something unexpected?",
-  "How often have you felt unable to control important things in your life?",
-  "How often have you felt nervous and stressed?",
-  "How often have you felt confident about handling personal problems?",
-  "How often have you felt things were going your way?",
-  "How often have you found you could not cope with all the things you had to do?",
-  "How often have you been able to control irritations in your life?",
-  "How often have you felt on top of things?",
-  "How often have you been angered because of things outside your control?",
-  "How often have you felt difficulties were piling up so high that you could not overcome them?",
+// ─── MHFA-based questions ────────────────────────────────────────────────────
+
+const depressionQuestions = [
+  { q: 'An unusually sad mood that does not go away?', context: 'In the last two weeks, have you frequently experienced:' },
+  { q: 'A loss of enjoyment or interest in activities you used to love?', context: 'In the last two weeks, have you frequently experienced:' },
+  { q: 'A significant lack of energy or feeling tired all the time?', context: 'In the last two weeks, have you frequently experienced:' },
+  { q: 'Changes in your sleep (sleeping too much or too little)?', context: 'In the last two weeks, have you frequently experienced:' },
+  { q: 'Changes in appetite or weight (loss or gain)?', context: 'In the last two weeks, have you frequently experienced:' },
+  { q: 'Difficulty concentrating or making simple decisions?', context: 'In the last two weeks, have you frequently experienced:' },
+  { q: 'Feelings of worthlessness, excessive guilt, or hopelessness?', context: 'In the last two weeks, have you frequently experienced:' },
 ];
 
 const anxietyQuestions = [
-  "Numbness or tingling",
-  "Feeling hot",
-  "Wobbliness in legs",
-  "Unable to relax",
-  "Fear of the worst happening",
-  "Dizzy or lightheaded",
-  "Heart pounding or racing",
-  "Unsteady",
-  "Terrified or afraid",
-  "Nervous",
+  { q: 'Physical symptoms like a racing heart (palpitations), sweating, or trembling?', context: 'Do you regularly experience:' },
+  { q: 'Shortness of breath or a "choking" sensation?', context: 'Do you regularly experience:' },
+  { q: 'Persistent catastrophising — expecting the worst possible outcome?', context: 'Do you regularly experience:' },
+  { q: 'A feeling of "unreality" or being detached from your surroundings?', context: 'Do you regularly experience:' },
+  { q: 'Repetitive behaviours (like excessive checking) to reduce fear?', context: 'Do you regularly experience:' },
+  { q: 'Avoidance of social situations or specific places due to fear?', context: 'Do you regularly experience:' },
 ];
 
-const options = ['Never', 'Almost Never', 'Sometimes', 'Fairly Often', 'Very Often'];
-const anxietyOptions = ['Not at all', 'Mildly', 'Moderately', 'Severely'];
+const stressQuestions = [
+  { q: 'Do you feel like your "container" is overflowing — constantly overwhelmed?', context: 'Stress Container model (MHFA):' },
+  { q: 'Are you experiencing your personal "stress signature" — physical or mental signs that you are at your limit?', context: 'Stress Container model (MHFA):' },
+  { q: 'Are you finding it difficult to "turn off autopilot" and be present in the moment?', context: 'Stress Container model (MHFA):' },
+  { q: 'Has your stress led to increased use of alcohol or other substances as a coping mechanism?', context: 'Stress Container model (MHFA):' },
+];
+
+// Scoring: Yes = 2, Sometimes = 1, No = 0
+const responseOptions = ['Yes', 'Sometimes', 'No'];
+const responseScores: Record<string, number> = { Yes: 2, Sometimes: 1, No: 0 };
+
+type Section = 'depression' | 'anxiety' | 'stress';
+type Phase = 'intro' | Section | 'results';
+
+interface Answers {
+  depression: number[];
+  anxiety: number[];
+  stress: number[];
+}
+
+const sectionMeta: Record<Section, { label: string; total: number; icon: typeof Brain }> = {
+  depression: { label: 'Section 1 — Depression', total: depressionQuestions.length, icon: Brain },
+  anxiety: { label: 'Section 2 — Anxiety', total: anxietyQuestions.length, icon: HeartPulse },
+  stress: { label: 'Section 3 — Stress & Burnout', total: stressQuestions.length, icon: Zap },
+};
 
 const Assessment = () => {
-  const [phase, setPhase] = useState<'intro' | 'pss' | 'anxiety' | 'results'>('intro');
-  const [pssIndex, setPssIndex] = useState(0);
-  const [anxIndex, setAnxIndex] = useState(0);
-  const [pssAnswers, setPssAnswers] = useState<number[]>([]);
-  const [anxAnswers, setAnxAnswers] = useState<number[]>([]);
+  const [phase, setPhase] = useState<Phase>('intro');
+  const [qIndex, setQIndex] = useState(0);
+  const [answers, setAnswers] = useState<Answers>({ depression: [], anxiety: [], stress: [] });
   const { addAssessment } = useAppState();
   const navigate = useNavigate();
 
-  const answerPss = (val: number) => {
-    const updated = [...pssAnswers, val];
-    setPssAnswers(updated);
-    if (pssIndex < pssQuestions.length - 1) {
-      setPssIndex(i => i + 1);
+  // Current question set
+  const currentQuestions =
+    phase === 'depression' ? depressionQuestions
+      : phase === 'anxiety' ? anxietyQuestions
+        : phase === 'stress' ? stressQuestions
+          : [];
+
+  const handleAnswer = (label: string) => {
+    if (phase === 'intro' || phase === 'results') return;
+    const score = responseScores[label];
+    const section = phase as Section;
+    const updated = [...answers[section], score];
+    setAnswers(prev => ({ ...prev, [section]: updated }));
+
+    if (qIndex < currentQuestions.length - 1) {
+      setQIndex(i => i + 1);
     } else {
-      setPhase('anxiety');
+      // Move to next section or results
+      setQIndex(0);
+      if (phase === 'depression') setPhase('anxiety');
+      else if (phase === 'anxiety') setPhase('stress');
+      else {
+        // Compute final scores (stress section answers are in `updated`)
+        const depScore2 = answers.depression.reduce((s, a) => s + a, 0);
+        const anxScore = answers.anxiety.reduce((s, a) => s + a, 0);
+        const strScore = updated.reduce((s, a) => s + a, 0);
+
+        const maxDep = depressionQuestions.length * 2;  // 14
+        const maxAnx = anxietyQuestions.length * 2;     // 12
+        const maxStr = stressQuestions.length * 2;      // 8
+
+        const depPct = (depScore2 / maxDep) * 100;
+        const anxPct = (anxScore / maxAnx) * 100;
+        const strPct = (strScore / maxStr) * 100;
+
+        const stressScore = Math.round((depPct + strPct) / 2);
+        const anxietyScore = Math.round(anxPct);
+        const burnoutRisk: 'low' | 'moderate' | 'high' =
+          strPct > 60 || depPct > 60 || anxPct > 60 ? 'high'
+            : strPct > 35 || depPct > 35 || anxPct > 35 ? 'moderate'
+              : 'low';
+
+        addAssessment({
+          date: new Date().toISOString().split('T')[0],
+          stressScore,
+          anxietyScore,
+          burnoutRisk,
+        });
+
+        setAnswers(prev => ({ ...prev, stress: updated }));
+        setPhase('results');
+      }
     }
   };
 
-  const answerAnxiety = (val: number) => {
-    const updated = [...anxAnswers, val];
-    setAnxAnswers(updated);
-    if (anxIndex < anxietyQuestions.length - 1) {
-      setAnxIndex(i => i + 1);
-    } else {
-      // Calculate results
-      // Reverse scoring for PSS items 4, 5, 7, 8 (0-indexed: 3, 4, 6, 7)
-      const reversedPss = updated.length > 0 ? pssAnswers : [];
-      let stressScore = 0;
-      pssAnswers.forEach((a, i) => {
-        if ([3, 4, 6, 7].includes(i)) {
-          stressScore += (4 - a);
-        } else {
-          stressScore += a;
-        }
-      });
-      const anxietyScore = updated.reduce((sum, a) => sum + a, 0);
-      const burnoutRisk: 'low' | 'moderate' | 'high' =
-        stressScore > 26 || anxietyScore > 25 ? 'high' :
-        stressScore > 13 || anxietyScore > 15 ? 'moderate' : 'low';
+  // ── Derived scores for results ──
+  const depScore = answers.depression.reduce((s, a) => s + a, 0);
+  const anxScore = answers.anxiety.reduce((s, a) => s + a, 0);
+  const strScore = answers.stress.reduce((s, a) => s + a, 0);
+  const maxDep = depressionQuestions.length * 2;
+  const maxAnx = anxietyQuestions.length * 2;
+  const maxStr = stressQuestions.length * 2;
+  const depPct = maxDep > 0 ? Math.round((depScore / maxDep) * 100) : 0;
+  const anxPct = maxAnx > 0 ? Math.round((anxScore / maxAnx) * 100) : 0;
+  const strPct = maxStr > 0 ? Math.round((strScore / maxStr) * 100) : 0;
+  const overallRisk: 'low' | 'moderate' | 'high' =
+    strPct > 60 || depPct > 60 || anxPct > 60 ? 'high'
+      : strPct > 35 || depPct > 35 || anxPct > 35 ? 'moderate'
+        : 'low';
 
-      addAssessment({
-        date: new Date().toISOString().split('T')[0],
-        stressScore,
-        anxietyScore,
-        burnoutRisk,
-      });
-      setPhase('results');
-    }
-  };
+  // ── Overall progress bar ──
+  const totalQ = depressionQuestions.length + anxietyQuestions.length + stressQuestions.length;
+  const answered =
+    answers.depression.length + answers.anxiety.length + answers.stress.length +
+    (phase !== 'intro' && phase !== 'results' ? qIndex : 0);
+  const overallProgress = Math.round((answered / totalQ) * 100);
 
-  const latestStress = pssAnswers.reduce((sum, a, i) => {
-    if ([3, 4, 6, 7].includes(i)) return sum + (4 - a);
-    return sum + a;
-  }, 0);
-  const latestAnxiety = anxAnswers.reduce((sum, a) => sum + a, 0);
-  const burnoutRisk = latestStress > 26 || latestAnxiety > 25 ? 'high' : latestStress > 13 || latestAnxiety > 15 ? 'moderate' : 'low';
-
+  // ─────────────────── INTRO ────────────────────────────────────────────────
   if (phase === 'intro') {
     return (
       <Layout>
-        <div className="px-5 pt-8 space-y-6">
+        <div className="px-5 pt-8 pb-6 space-y-5">
           <FadeIn>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-xl bg-info/10 flex items-center justify-center">
-                <Brain className="text-info" size={24} />
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Brain className="text-primary" size={22} />
               </div>
               <div>
                 <h1 className="text-2xl font-serif text-foreground">Mental First Aid</h1>
-                <p className="text-sm text-muted-foreground">Quick emotional support & assessment</p>
+                <p className="text-sm text-muted-foreground">MHFA Wellbeing Assessment</p>
               </div>
             </div>
           </FadeIn>
 
-          <FadeIn delay={0.1}>
-            <div className="bg-card rounded-2xl p-5 shadow-card space-y-4">
-              <h3 className="font-semibold text-foreground">What we'll assess:</h3>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-sm font-bold text-primary">1</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Perceived Stress Scale (PSS)</p>
-                    <p className="text-xs text-muted-foreground">10 questions · ~3 minutes</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-sm font-bold text-accent">2</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Beck Anxiety Inventory</p>
-                    <p className="text-xs text-muted-foreground">10 questions · ~3 minutes</p>
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Your responses are private and stored locally. These are screening tools, not diagnoses.
+          {/* MHFA disclaimer */}
+          <FadeIn delay={0.08}>
+            <div className="bg-primary/5 border border-primary/15 rounded-xl px-4 py-3 flex gap-3">
+              <Info size={15} className="text-primary flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-foreground/80 leading-relaxed">
+                This tool is based on the <strong>Mental Health First Aid (MHFA)</strong> manual. It is an
+                educational self-reflection aid — not a clinical diagnosis. MHFAiders are trained to
+                recognise early signs and provide initial support until professional help is obtained.
               </p>
             </div>
           </FadeIn>
 
-          <FadeIn delay={0.2}>
+          {/* What's assessed */}
+          <FadeIn delay={0.12}>
+            <div className="bg-card border border-border rounded-xl shadow-card overflow-hidden">
+              <div className="px-4 py-3 border-b border-border">
+                <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                  Three Sections · ~5 minutes
+                </p>
+              </div>
+              <div className="divide-y divide-border">
+                {[
+                  { num: '1', label: 'Depression', sub: `${depressionQuestions.length} indicators · MHFA symptom clusters`, color: 'text-primary', bg: 'bg-primary/10' },
+                  { num: '2', label: 'Anxiety', sub: `${anxietyQuestions.length} indicators · MHFA symptom clusters`, color: 'text-accent', bg: 'bg-accent/10' },
+                  { num: '3', label: 'Stress & Burnout', sub: `${stressQuestions.length} indicators · Stress Container model`, color: 'text-warning', bg: 'bg-warning/10' },
+                ].map(item => (
+                  <div key={item.num} className="flex items-center gap-3 px-4 py-3">
+                    <div className={`w-7 h-7 rounded-lg ${item.bg} flex items-center justify-center flex-shrink-0`}>
+                      <span className={`text-xs font-bold ${item.color}`}>{item.num}</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{item.label}</p>
+                      <p className="text-xs text-muted-foreground">{item.sub}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="px-4 py-3 border-t border-border bg-muted/40">
+                <p className="text-[11px] text-muted-foreground">
+                  Your responses are stored locally on this device and never shared.
+                </p>
+              </div>
+            </div>
+          </FadeIn>
+
+          {/* ALGEE note */}
+          <FadeIn delay={0.18}>
+            <div className="bg-card border border-border rounded-xl px-4 py-3 flex gap-3">
+              <HeartPulse size={15} className="text-accent flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Assessment follows the <strong className="text-foreground">ALGEE Action Plan</strong> framework.
+                Results include MHFA-recommended next steps: encourage professional help (Action 4) and
+                self-care supports (Action 5).
+              </p>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.22}>
             <Button
-              onClick={() => setPhase('pss')}
-              className="w-full rounded-xl py-6 gradient-calm border-none text-primary-foreground"
+              onClick={() => { setPhase('depression'); setQIndex(0); }}
+              className="w-full rounded-xl py-6 gradient-calm border-none text-primary-foreground font-semibold"
             >
-              Begin Assessment <ChevronRight size={18} className="ml-1" />
+              Begin Assessment <ChevronRight size={17} className="ml-1" />
             </Button>
           </FadeIn>
         </div>
@@ -154,81 +235,116 @@ const Assessment = () => {
     );
   }
 
+  // ─────────────────── RESULTS ──────────────────────────────────────────────
   if (phase === 'results') {
+    const riskConfig = {
+      high: { bg: 'bg-destructive/8 border-destructive/20', icon: 'text-destructive', label: 'High', text: 'Your responses suggest notable symptoms across one or more domains. MHFA strongly advises speaking with your GP or a mental health professional (ALGEE Action 4).' },
+      moderate: { bg: 'bg-warning/8 border-warning/20', icon: 'text-warning', label: 'Moderate', text: 'Some indicators are present. Consistent use of self-care strategies — exercise, mindfulness, connecting with others — can be beneficial (ALGEE Action 5).' },
+      low: { bg: 'bg-success/8 border-success/20', icon: 'text-success', label: 'Low', text: 'Symptom levels appear low. Keep maintaining your wellbeing practices and retake this assessment periodically.' },
+    };
+    const rc = riskConfig[overallRisk];
+
     return (
       <Layout>
-        <div className="px-5 pt-8 space-y-5">
+        <div className="px-5 pt-8 pb-6 space-y-5">
           <FadeIn>
-            <div className="text-center mb-4">
+            <div className="flex flex-col items-center text-center gap-2 mb-2">
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ scale: 0 }} animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 200 }}
-                className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3"
+                className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-1"
               >
-                <CheckCircle className="text-primary" size={32} />
+                <CheckCircle2 className="text-primary" size={28} />
               </motion.div>
               <h1 className="text-2xl font-serif text-foreground">Your Results</h1>
+              <p className="text-xs text-muted-foreground">Based on the MHFA Wellbeing Questionnaire</p>
             </div>
           </FadeIn>
 
-          <FadeIn delay={0.1}>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-card rounded-2xl p-4 shadow-card text-center">
-                <p className="text-3xl font-bold text-primary">{latestStress}</p>
-                <p className="text-xs text-muted-foreground mt-1">Stress Score</p>
-                <p className="text-[10px] text-muted-foreground">(out of 40)</p>
+          {/* Score bars */}
+          <FadeIn delay={0.08}>
+            <div className="bg-card border border-border rounded-xl shadow-card overflow-hidden">
+              <div className="px-4 py-3 border-b border-border">
+                <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">Indicator Summary</p>
               </div>
-              <div className="bg-card rounded-2xl p-4 shadow-card text-center">
-                <p className="text-3xl font-bold text-info">{latestAnxiety}</p>
-                <p className="text-xs text-muted-foreground mt-1">Anxiety Score</p>
-                <p className="text-[10px] text-muted-foreground">(out of 30)</p>
+              <div className="px-4 py-4 space-y-4">
+                {[
+                  { label: 'Depression', pct: depPct, color: 'bg-primary' },
+                  { label: 'Anxiety', pct: anxPct, color: 'bg-accent' },
+                  { label: 'Stress & Burnout', pct: strPct, color: 'bg-warning' },
+                ].map(row => (
+                  <div key={row.label}>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-xs font-medium text-foreground">{row.label}</span>
+                      <span className="text-xs text-muted-foreground">{row.pct}%</span>
+                    </div>
+                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                      <motion.div
+                        className={`h-full rounded-full ${row.color}`}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${row.pct}%` }}
+                        transition={{ duration: 0.7, ease: 'easeOut' }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </FadeIn>
 
-          <FadeIn delay={0.15}>
-            <div className={`rounded-2xl p-4 shadow-card ${
-              burnoutRisk === 'high' ? 'bg-destructive/10' :
-              burnoutRisk === 'moderate' ? 'bg-warning/10' : 'bg-success/10'
-            }`}>
+          {/* Overall risk */}
+          <FadeIn delay={0.14}>
+            <div className={`rounded-xl border p-4 ${rc.bg}`}>
               <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle size={18} className={
-                  burnoutRisk === 'high' ? 'text-destructive' :
-                  burnoutRisk === 'moderate' ? 'text-warning' : 'text-success'
-                } />
+                <AlertTriangle size={16} className={rc.icon} />
                 <p className="text-sm font-semibold text-foreground">
-                  Burnout Risk: {burnoutRisk.charAt(0).toUpperCase() + burnoutRisk.slice(1)}
+                  Overall Indicator: <span className={rc.icon}>{rc.label}</span>
                 </p>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {burnoutRisk === 'high'
-                  ? "Your scores suggest elevated stress and anxiety. Consider speaking with a professional and using our calming tools regularly."
-                  : burnoutRisk === 'moderate'
-                  ? "Your stress levels are moderate. Regular use of calming techniques can help bring these down."
-                  : "Your levels are within a healthy range. Keep up your wellness practices!"}
-              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{rc.text}</p>
             </div>
           </FadeIn>
 
+          {/* ALGEE next steps */}
           <FadeIn delay={0.2}>
-            <div className="bg-card rounded-2xl p-4 shadow-card">
-              <h3 className="text-sm font-semibold text-foreground mb-2">Recommended actions</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• Try our box breathing exercise daily</li>
-                <li>• Use the AI Coach for personalized support</li>
-                <li>• Retake this assessment in 2 weeks</li>
-                <li>• Practice micro-breaks between patients</li>
-              </ul>
+            <div className="bg-card border border-border rounded-xl shadow-card overflow-hidden">
+              <div className="px-4 py-3 border-b border-border">
+                <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                  ALGEE Recommended Next Steps
+                </p>
+              </div>
+              <div className="divide-y divide-border">
+                <div className="flex gap-3 px-4 py-3">
+                  <PhoneCall size={15} className="text-primary flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-semibold text-foreground">Action 4 — Encourage Professional Help</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Speak to your GP or a registered mental health professional for a proper evaluation.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3 px-4 py-3">
+                  <HeartPulse size={15} className="text-accent flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-semibold text-foreground">Action 5 — Encourage Other Supports</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Exercise, mindfulness, social connection, journalling, or helplines/text support services.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3 px-4 py-3">
+                  <Brain size={15} className="text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-semibold text-foreground">Note on depression &amp; anxiety</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">MHFA notes that prolonged stress from one often leads to the other — early recognition is key.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </FadeIn>
 
-          <FadeIn delay={0.25}>
+          <FadeIn delay={0.26}>
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => navigate('/calming')} className="flex-1 rounded-xl py-5">
-                Try Calming Tools
+              <Button variant="outline" onClick={() => navigate('/calming')} className="flex-1 rounded-xl py-5 text-sm">
+                Calming Tools
               </Button>
-              <Button onClick={() => navigate('/')} className="flex-1 rounded-xl py-5 gradient-calm border-none text-primary-foreground">
+              <Button onClick={() => navigate('/')} className="flex-1 rounded-xl py-5 gradient-calm border-none text-primary-foreground text-sm font-semibold">
                 Back to Home
               </Button>
             </div>
@@ -238,54 +354,51 @@ const Assessment = () => {
     );
   }
 
-  // Question phase
-  const isPss = phase === 'pss';
-  const currentQ = isPss ? pssQuestions[pssIndex] : anxietyQuestions[anxIndex];
-  const currentOptions = isPss ? options : anxietyOptions;
-  const currentIndex = isPss ? pssIndex : anxIndex;
-  const totalQ = isPss ? pssQuestions.length : anxietyQuestions.length;
-  const overallProgress = isPss
-    ? (pssIndex / (pssQuestions.length + anxietyQuestions.length)) * 100
-    : ((pssQuestions.length + anxIndex) / (pssQuestions.length + anxietyQuestions.length)) * 100;
+  // ─────────────────── QUESTION PHASE ──────────────────────────────────────
+  const section = phase as Section;
+  const meta = sectionMeta[section];
+  const currentQ = currentQuestions[qIndex];
 
   return (
     <Layout>
-      <div className="px-5 pt-8 space-y-6">
+      <div className="px-5 pt-8 pb-6 space-y-5">
+        {/* Progress */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-muted-foreground">
-              {isPss ? 'Perceived Stress Scale' : 'Beck Anxiety Inventory'}
-            </p>
-            <p className="text-xs text-muted-foreground">{currentIndex + 1}/{totalQ}</p>
+            <p className="text-xs font-semibold text-muted-foreground">{meta.label}</p>
+            <p className="text-xs text-muted-foreground">{qIndex + 1} / {meta.total}</p>
           </div>
           <Progress value={overallProgress} className="h-1.5" />
         </div>
 
         <AnimatePresence mode="wait">
           <motion.div
-            key={`${phase}-${currentIndex}`}
-            initial={{ opacity: 0, x: 20 }}
+            key={`${phase}-${qIndex}`}
+            initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.25 }}
-            className="space-y-5"
+            exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.22 }}
+            className="space-y-4"
           >
-            <div className="bg-card rounded-2xl p-5 shadow-card">
-              <p className="text-sm text-muted-foreground mb-2">
-                {isPss ? 'In the last month...' : 'In the past week, how much were you bothered by:'}
+            {/* Question card */}
+            <div className="bg-card border border-border rounded-xl p-5 shadow-card">
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-muted-foreground mb-2">
+                {currentQ.context}
               </p>
-              <h2 className="text-lg font-semibold text-foreground leading-snug">{currentQ}</h2>
+              <h2 className="text-base font-semibold text-foreground leading-snug">{currentQ.q}</h2>
             </div>
 
+            {/* Response options */}
             <div className="space-y-2">
-              {currentOptions.map((opt, i) => (
+              {responseOptions.map(opt => (
                 <motion.button
                   key={opt}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => isPss ? answerPss(i) : answerAnxiety(i)}
-                  className="w-full text-left px-5 py-4 rounded-xl bg-card shadow-card hover:bg-secondary transition-colors text-sm font-medium text-foreground"
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => handleAnswer(opt)}
+                  className="w-full text-left px-5 py-4 rounded-xl bg-card border border-border hover:border-primary/40 hover:bg-primary/5 transition-colors text-sm font-medium text-foreground flex items-center justify-between group"
                 >
                   {opt}
+                  <ChevronRight size={15} className="text-muted-foreground group-hover:text-primary transition-colors" />
                 </motion.button>
               ))}
             </div>
