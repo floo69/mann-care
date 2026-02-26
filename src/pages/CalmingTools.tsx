@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Layout from '@/components/Layout';
 import { FadeIn } from '@/components/Animations';
 import { motion } from 'framer-motion';
-import { Wind, Play, Pause, RotateCcw } from 'lucide-react';
+import { Wind, Play, Pause, RotateCcw, Music2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 type BreathPhase = 'inhale' | 'hold1' | 'exhale' | 'hold2' | 'idle';
@@ -18,9 +18,107 @@ const phaseDuration = 4000; // 4 seconds per phase
 const tools = [
   { id: 'box', label: 'Box Breathing', emoji: '🫁', desc: '4-4-4-4 pattern' },
   { id: 'meditation', label: '5-Min Meditation', emoji: '🧘', desc: 'Guided mindfulness' },
-  { id: 'nature', label: 'Nature Sounds', emoji: '🌿', desc: 'Forest & rain' },
+  { id: 'nature', label: 'Calming Music', emoji: '🎵', desc: 'Magical moments melody' },
   { id: 'fidget', label: 'Fidget Tool', emoji: '🔮', desc: 'Tap to release' },
 ];
+
+const CalmingMusicPlayer = ({ onBack }: { onBack: () => void }) => {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const toggle = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play();
+    }
+    setIsPlaying(p => !p);
+  };
+
+  // Pause on unmount
+  useEffect(() => {
+    return () => { audioRef.current?.pause(); };
+  }, []);
+
+  return (
+    <Layout>
+      <audio ref={audioRef} src="/Magical-Moments-chosic.com_.mp3.mpeg" loop />
+      <div className="px-5 pt-8 flex flex-col items-center text-center min-h-[calc(100vh-7rem)]">
+        <button onClick={() => { audioRef.current?.pause(); onBack(); }}
+          className="text-sm text-muted-foreground mb-6 self-start">← Back to tools</button>
+
+        <h1 className="text-2xl font-serif text-foreground mb-1">Calming Music</h1>
+        <p className="text-xs text-muted-foreground mb-10">Let the music wash away your stress</p>
+
+        {/* Animated orb */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="relative flex items-center justify-center">
+            {/* Outer pulse rings */}
+            {isPlaying && (
+              <>
+                <motion.div
+                  animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute w-56 h-56 rounded-full bg-primary/20"
+                />
+                <motion.div
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0, 0.4] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                  className="absolute w-48 h-48 rounded-full bg-primary/25"
+                />
+              </>
+            )}
+            {/* Main orb */}
+            <motion.div
+              animate={isPlaying
+                ? { scale: [1, 1.08, 1], opacity: [0.85, 1, 0.85] }
+                : { scale: 1, opacity: 0.6 }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="w-44 h-44 rounded-full gradient-calm flex items-center justify-center shadow-elevated"
+            >
+              <Music2 size={48} className="text-primary-foreground opacity-90" />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Track name pill */}
+        <div className="bg-card rounded-2xl shadow-card px-5 py-3 mb-6 flex items-center gap-3 w-full max-w-xs">
+          <div className={`w-2 h-8 rounded-full ${isPlaying ? 'bg-primary animate-pulse' : 'bg-border'}`} />
+          <div className="text-left">
+            <p className="text-sm font-semibold text-foreground">Magical Moments</p>
+            <p className="text-[10px] text-muted-foreground">{isPlaying ? 'Now playing · Looping' : 'Tap play to start'}</p>
+          </div>
+          {isPlaying && (
+            <motion.div
+              animate={{ scaleY: [0.4, 1, 0.4] }}
+              transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
+              className="ml-auto flex gap-0.5 items-end h-5"
+            >
+              {[1, 2, 3].map(b => (
+                <motion.div
+                  key={b}
+                  animate={{ scaleY: [0.4, 1, 0.4] }}
+                  transition={{ duration: 0.8, repeat: Infinity, delay: b * 0.15 }}
+                  className="w-1 h-full rounded-full bg-primary origin-bottom"
+                />
+              ))}
+            </motion.div>
+          )}
+        </div>
+
+        {/* Play / Pause */}
+        <Button
+          onClick={toggle}
+          className="rounded-2xl px-10 py-5 mb-10 gradient-calm border-none text-primary-foreground text-base font-semibold shadow-elevated"
+        >
+          {isPlaying ? <><Pause size={20} className="mr-2" /> Pause</> : <><Play size={20} className="mr-2" /> Play</>}
+        </Button>
+      </div>
+    </Layout>
+  );
+};
 
 const CalmingTools = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
@@ -174,28 +272,7 @@ const CalmingTools = () => {
   }
 
   if (activeTool === 'nature') {
-    return (
-      <Layout>
-        <div className="px-5 pt-8 flex flex-col items-center text-center min-h-[calc(100vh-7rem)]">
-          <button onClick={() => setActiveTool(null)}
-            className="text-sm text-muted-foreground mb-6">← Back to tools</button>
-          <h1 className="text-2xl font-serif text-foreground mb-2">Nature Sounds</h1>
-
-          <div className="flex-1 flex items-center justify-center">
-            <motion.div
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ duration: 4, repeat: Infinity }}
-              className="w-48 h-48 rounded-full bg-success/10 flex items-center justify-center"
-            >
-              <span className="text-6xl">🌿</span>
-            </motion.div>
-          </div>
-          <p className="text-sm text-muted-foreground mb-8 max-w-xs leading-relaxed">
-            Close your eyes and imagine yourself in a peaceful forest. Listen to the rustling leaves and gentle rain...
-          </p>
-        </div>
-      </Layout>
-    );
+    return <CalmingMusicPlayer onBack={() => setActiveTool(null)} />;
   }
 
   // Tool selection

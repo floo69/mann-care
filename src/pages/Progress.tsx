@@ -3,6 +3,7 @@ import { FadeIn } from '@/components/Animations';
 import { useAppState } from '@/context/AppContext';
 import { BarChart3, TrendingDown, Flame } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, Area } from 'recharts';
+import { HeartRateMonitor } from '@/components/HeartRateMonitor';
 
 const ProgressPage = () => {
   const { assessments, moods } = useAppState();
@@ -53,6 +54,11 @@ const ProgressPage = () => {
               <p className="text-[10px] text-muted-foreground">Day Streak</p>
             </div>
           </div>
+        </FadeIn>
+
+        {/* Heart Rate Monitor */}
+        <FadeIn delay={0.12}>
+          <HeartRateMonitor />
         </FadeIn>
 
         {/* Stress & Anxiety chart */}
